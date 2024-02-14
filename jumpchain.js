@@ -1042,7 +1042,7 @@ class AltForm {
     }
 
     set Height(height){
-        this.HeightImperial = localStorage.getItem("unitsImperial");
+        this.HeightImperial = localStorage.getItem("unitsImperial") == "true";
         this.HeightInUnits = height;
     }
 
@@ -1062,7 +1062,7 @@ class AltForm {
     }
 
     set Weight(weight){
-        this.WeightImperial = localStorage.getItem("unitsImperial");
+        this.WeightImperial = localStorage.getItem("unitsImperial") == "true";
         this.WeightInUnits = weight;
     }
 
