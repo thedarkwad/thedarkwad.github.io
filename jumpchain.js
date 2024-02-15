@@ -710,7 +710,8 @@ class Jump {
         if (!jumper) return false;
         if (jumper.Primary) return true;
         for (let p of this.Purchases) {
-            if (p.Type == PurchaseTypes.Companion && p.CompanionIDs.includes(jumperID))
+            if (p.Type == PurchaseTypes.Companion 
+                && (p.CompanionIDs.includes(+jumperID) || p.CompanionIDs.includes(`${jumperID}`)))
                 return true; 
         }
         return false;
