@@ -1,6 +1,6 @@
 class CheckBoxSelect {
     constructor(label, single = true, fullList = false, defaultSingle = true){
-        this.Container = E("div", {class: "checkboxselect"});
+        this.Container = E("div", {class: "checkboxselect hidden"});
         this.Head = E("span", {class: "head"});
         this.Expand = E("a", {
             href: "#;", 
@@ -44,6 +44,7 @@ class CheckBoxSelect {
     Close() {
         this.IsOpen = false;
         this.Expand.classList.add("expand"); this.Expand.classList.remove("collapse");
+        this.Container.classList.add("hidden");
         window.removeEventListener("click", this.CloseListener);
         if("InputListener" in this) this.InputListener();
     }
@@ -51,6 +52,7 @@ class CheckBoxSelect {
     Open(){
         this.IsOpen = true;
         this.Expand.classList.remove("expand"); this.Expand.classList.add("collapse");
+        this.Container.classList.remove("hidden");
         window.addEventListener("click", this.CloseListener);
     }
 
@@ -148,7 +150,7 @@ class CheckBoxSelect {
 
 class MultiNumeric {
     constructor(label){
-        this.Container = E("div", {class: "checkboxselect"});
+        this.Container = E("div", {class: "checkboxselect hidden"});
         this.Head = E("span", {class: "head"});
         this.Expand = E("a", {
             href: "#;", 
@@ -181,6 +183,7 @@ class MultiNumeric {
     Close() {
         this.IsOpen = false;
         this.Expand.classList.add("expand"); this.Expand.classList.remove("collapse");
+        this.Container.classList.add("hidden");
         window.removeEventListener("click", this.CloseListener);
 
         for(let i = 0; i < this.Selected.length; i++) {
@@ -198,6 +201,7 @@ class MultiNumeric {
     Open() {
         this.IsOpen = true;
         this.Expand.classList.remove("expand"); this.Expand.classList.add("collapse");
+        this.Container.classList.remove("hidden");
         if(this.Selected.length > 0) this.Selected[0].Input.focus();
         window.addEventListener("click", this.CloseListener);
     }
@@ -290,7 +294,7 @@ class MultiNumeric {
 
 class OptionalNumeric {
     constructor(inactiveLabel, activeLabel, def = -1){
-        this.Container = E("div", {class: "checkboxselect"});
+        this.Container = E("div", {class: "checkboxselect hidden"});
         this.Head = E("span", {class: "head"});
         this.Expand = E("a", {
             href: "#;", 
@@ -361,6 +365,7 @@ class OptionalNumeric {
     Close() {
         this.IsOpen = false;
         this.Expand.classList.add("expand"); this.Expand.classList.remove("collapse");
+        this.Container.classList.add("hidden");
         window.removeEventListener("click", this.CloseListener);
 
         if (this.NumericEntry.value <= 0) {
@@ -375,6 +380,7 @@ class OptionalNumeric {
     Open() {
         this.IsOpen = true;
         this.Expand.classList.remove("expand"); this.Expand.classList.add("collapse");
+        this.Container.classList.remove("hidden");
         if(this.Selected) this.NumericEntry.focus();
         window.addEventListener("click", this.CloseListener);
     }

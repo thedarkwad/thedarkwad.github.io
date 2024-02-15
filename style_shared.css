@@ -12,8 +12,8 @@ body {
     margin: 0px;
     padding: 0px;
 
-    --accent_font: Segoe UI, "Lucida Grande";
-    --body_font: Segoe UI, "Lucida Grande";
+    --accent_font: Segoe UI, "Lucida Grande", sans-serif;
+    --body_font: Segoe UI, "Lucida Grande", sans-serif;
     --heading_font: Arial;
 
     --body_font_size: 0.8rem;
@@ -744,7 +744,7 @@ div:not(:has(.edit, .save)) .row .placeholder{
     border-radius: 3px;
 }
 
-.checkboxselect:has(.expand) .body{
+.checkboxselect.hidden .body{
     display: none !important;
 }
 
