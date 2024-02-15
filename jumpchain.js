@@ -152,7 +152,7 @@ class ChainClass {
             {Name: "Tools"},
             {Name: "Places"},
             {Name: "Creatures"},
-            {Name: "Buisnesses & Contacts"},
+            {Name: "Businesses & Contacts"},
             {Name: "Other"}
         ];
         this.PurchaseCategories[PurchaseTypes.Companion] = [{Name: "Companion"}];
