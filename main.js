@@ -1,10 +1,12 @@
 let chainDataURL;
+let autosave;
+let secondsBetweenAutosaves = 60;
+
+
 
 function saveLocally(){
-    console.log("Autosaved!");
     localStorage.setItem("chainDump", JSON.stringify(Chain));
     localStorage.setItem("unusedID", unusedID); 
-    lastSave = Date.now();
 }
 
 function beginRender(){
@@ -81,9 +83,10 @@ function newChain() {
 }
 
 function setupUserPreferences() {
-    localStorage.setItem("colorMode", "dark");
-    localStorage.setItem("bodyFont", "3");
-    localStorage.setItem("unitsImperial", "true");
+    if (!localStorage.getItem("colorMode")) localStorage.setItem("colorMode", "dark");
+    if (!localStorage.getItem("bodyFont")) localStorage.setItem("bodyFont", "3");
+    if (!localStorage.getItem("unitsImperial")) localStorage.setItem("unitsImperial", "true");
+    if (!localStorage.getItem("autosave")) localStorage.setItem("autosave", "true");
 }
 
 function exportFile(){
@@ -98,7 +101,6 @@ function exportFile(){
 
 function importFile(json){
     let [newUnusedID, jsonChain] = JSON.parse(json);
-    console.log(jsonChain);
 
     unusedID = newUnusedID;
     
@@ -110,6 +112,10 @@ function importFile(json){
 function applyUserPreferences() {
     document.getElementById("color_mode").setAttribute("href", `style_${localStorage.getItem("colorMode")}.css`);
     document.body.style.setProperty("--body_font_size", `${.5 + localStorage.getItem("bodyFont")/10}rem`);
+    if (localStorage.getItem("autosave") == "true") {
+        autosave = setInterval(saveLocally, secondsBetweenAutosaves * 1000);
+    }
+
 }
 
 
@@ -125,7 +131,7 @@ function load(json){
 
 function startUp() {
 
-    if(!localStorage.getItem("colorMode")) setupUserPreferences();
+    setupUserPreferences();
     applyUserPreferences();
 
     let json = localStorage.getItem("chainDump");
@@ -134,9 +140,6 @@ function startUp() {
     } else {
         newChain();
     }
-
-    let secondsBetweenAutosaves = 60;
-    setInterval(saveLocally, secondsBetweenAutosaves * 1000);
 
 }
 
@@ -164,12 +167,24 @@ function setupSettingsDropdown(panel){
         localStorage.setItem("unitsImperial", unitSelect.value);
     });
 
+    let autosaveSelect = new CheckBoxSelect("Autosave", true);
+    autosaveSelect.AddOption("Every 60s", "true", localStorage.getItem("autosave") == "true");
+    autosaveSelect.AddOption("Never", "false", localStorage.getItem("autosave") == "false");
+    autosaveSelect.addInputListener(() => {
+        localStorage.setItem("autosave", autosaveSelect.value);
+        clearInterval(autosave);
+        if (autosaveSelect.value == "true") {
+            autosave = setInterval(saveLocally, secondsBetweenAutosaves * 1000);
+        }
+    });
 
     panel.append(
     E("div", {class: "vcentered stretch sublabel"}, T("Preferences:")),
     E("div", {class: "vcentered label"}, T("Theme:")), themeSelect.DOM, 
     E("div", {class: "vcentered label"}, T("Font Size:")), fontSelect, 
-    E("div", {class: "vcentered label"}, T("Units:")), unitSelect.DOM );
+    E("div", {class: "vcentered label"}, T("Units:")), unitSelect.DOM,
+    E("div", {class: "vcentered label"}, T("Autosave:")), autosaveSelect.DOM 
+    );
 
 }
 

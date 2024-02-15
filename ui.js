@@ -644,7 +644,6 @@ function renderBudgetBar(){
             
             new MutationObserver(() => {
                 cDisplay2.style.setProperty("display", (cNum2.nodeValue > 0) ? "inline" : "none", "important");
-                console.log(cDisplay2.style.display);
               }).observe(cNum2, {characterData: true, childList: true});
               
 
@@ -992,7 +991,7 @@ function renderSupplementScreen(panel, supplement) {
     
     if(supplement.URL.length > 0) {
         titleSpan.append(
-            E("a", {class: "icon button link small", style:{position: "relative", top: "-0.1rem"}, href: supplement.URL, target:"_blank"})
+            E("a", {class: "icon button link small", style:{marginLeft: "0.5rem", position: "relative", top: "-0.1rem"}, href: supplement.URL, target:"_blank"})
         )
     }
 
