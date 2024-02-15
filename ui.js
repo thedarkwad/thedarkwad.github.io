@@ -13,6 +13,16 @@ function setUpTextArea (tx){
     tx.addEventListener("input", onInput, false);
 }
 
+function toggleHighlighting(child){
+    for (let element = child; element; element = element.parentElement) {
+        if (element.classList.contains("highlightable")) {
+            element.classList.toggle("highlighted");
+            break;
+        }
+    }
+
+}
+
 function loremIpsum (){
     return "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum";
 }
@@ -61,8 +71,30 @@ function T (text) {
 
 }
 
-function doAccordian(button){
-    button.classList.toggle('expand');button.classList.toggle('collapse');
+function doAccordian(button, expand = -1){
+    if (expand < 0) {
+        button.classList.toggle('expand');button.classList.toggle('collapse');
+    } else {
+        if (expand) {
+            button.classList.remove('expand');button.classList.add('collapse');
+        } else {
+            button.classList.add('expand');button.classList.remove('collapse');
+        }
+    }
+    for (let element = button; element; element = element.parentElement) {
+        if (element.classList.contains("collapsable")) {
+            if (expand < 0) {
+                element.classList.toggle("collapsed");
+            } else {
+                if (expand) {
+                    element.classList.remove("collapsed");
+                } else {
+                    element.classList.add("collapsed");
+                }
+            }
+            break;
+        }
+    }
 }
 
 function createIconButton(type, modifiers = "", params = {}){
@@ -76,6 +108,7 @@ function createIconButton(type, modifiers = "", params = {}){
             button.setAttribute("title", "Save");
             button.addEventListener("click", 
                 ()=>{
+                    toggleHighlighting(button);
                     saveForm(params.InputList, params.Item, params.FieldList,
                     () => {
                         params.Form.replaceWith(
@@ -86,9 +119,7 @@ function createIconButton(type, modifiers = "", params = {}){
         case "edit":
             button.setAttribute("title", "Edit");
             button.addEventListener("click", ()=>{
-                params.Form.querySelectorAll(".expand").forEach((dom) => {
-                    dom.classList.toggle("expand"); dom.classList.toggle("collapse");
-                });
+                toggleHighlighting(button);
                 swapInInputs(
                     params.Form, params.Item, params.FieldList, params.Callback, params.IDPrefix, params.Deletable);
                 }, false);
@@ -124,10 +155,12 @@ function createIconButton(type, modifiers = "", params = {}){
 
 function renderPurchase(purchase, updateCallback, expand = false, abbreviated = false, fixedSubtype = false){
     let displayContainer = E("form", {
-        class: "compact collapsable row", 
+        class: "compact collapsable row highlightable", 
         autocomplete: "off",
         id: `purchase${purchase.ID}_display`
     });
+
+    if (!expand) displayContainer.classList.add("collapsed");
 
     let isSupplement = purchase.Type == PurchaseTypes.Supplement;
     let subtypeName = DP.ActiveJump.PurchaseSubTypes[purchase.Subtype].Name;
@@ -277,9 +310,11 @@ function renderPurchase(purchase, updateCallback, expand = false, abbreviated = 
 function renderDrawback(drawback, expand = false){
     let displayContainer = E("form", {
         autocomplete: "off", onSubmit: "return false;",
-        class: "collapsable row", 
+        class: "collapsable row highlightable", 
         id: `drawback${drawback.ID}_display`
     });
+
+    if (!expand) displayContainer.classList.add("collapsed");
 
     let IDSuffix = (drawback.Jump) ? `${DP.ActiveJump.ID}_${drawback.ID}` : `ChainDrawback_${drawback.ID}`;
 
@@ -596,16 +631,22 @@ function renderBudgetBar(){
         DP.ActiveJump.RenderLocation[DP.ActiveJumperID][c] = cNum;
 
         for (let subtype in DP.ActiveJump.PurchaseSubTypes){
-            cDisplay = E("span", {class: "bubble_accent"}, 
+            let cDisplay2 = E("span", {class: "bubble_accent"}, 
                 E("span", {class: "label"}, 
                     T(`${DP.ActiveJump.PurchaseSubTypes[subtype].Name} Stipend:\u00A0`)
                 )
             );
-            cNum = T();
-            cDisplay.append(E("span", {class: "nonzero_numeric"}, cNum));
-            cDisplay.append(`\u00A0${DP.ActiveJump.Currencies[c].Abbrev}`);
-            budgetBar.append(cDisplay);
-            DP.ActiveJump.StipendRenders[DP.ActiveJumperID][c][subtype] = cNum;    
+            let cNum2 = T();
+            cDisplay2.append(E("span", {}, cNum2));
+            cDisplay2.append(`\u00A0${DP.ActiveJump.Currencies[c].Abbrev}`);
+            budgetBar.append(cDisplay2);
+            DP.ActiveJump.StipendRenders[DP.ActiveJumperID][c][subtype] = cNum2;  
+            
+            new MutationObserver(() => {
+                cDisplay2.style.setProperty("display", (cNum2.nodeValue > 0) ? "inline" : "none", "important");
+                console.log(cDisplay2.style.display);
+              }).observe(cNum2, {characterData: true, childList: true});
+              
 
         }
     }
@@ -640,10 +681,10 @@ function renderPurchaseFilterBar(purchaseType, renderCallback, listContainer, su
     expandCheckBox.addEventListener("input", () => {
         if (expandCheckBox.checked) {
             listContainer.querySelectorAll(".expand").forEach(
-                (n) => {n.classList.add("collapse"); n.classList.remove("expand");});
+                (n) => {doAccordian(n, 1);});
         } else {
             listContainer.querySelectorAll(".collapse").forEach(
-                (n) => {n.classList.remove("collapse"); n.classList.add("expand");});
+                (n) => {doAccordian(n, 0);});
         }
 
     }
@@ -1134,7 +1175,7 @@ function renderJumperCharacteristic(field, labelText, expanded) {
     if (!single && !expanded) expanded = jumper[field].Description.length > 0;
 
     let form = E("form", {
-        class: `row compact`,
+        class: `row compact highlightable`,
         autocomplete: "off", onSubmit: "return false;"}
     );
     
@@ -1155,6 +1196,7 @@ function renderJumperCharacteristic(field, labelText, expanded) {
     );
 
     if(!single) {
+        if (!expanded) form.classList.add("collapsed");
         entry.append(createIconButton((expanded)?"collapse":"expand", "small alt"));
     }
 
@@ -1194,7 +1236,7 @@ function renderOriginCategory(origin, originID, expanded = undefined) {
     let single = DP.ActiveJump.OriginCategories[originID].Single;
 
     let form = E("form", {
-        class: `row compact`,
+        class: `row compact highlightable`,
         autocomplete: "off", onSubmit: "return false;",
         id:`jump${DP.ActiveJump.ID}_${DP.ActiveJumperID}_${originID}_form`});
     if(!single) form.classList.add("collapsable");
@@ -1214,6 +1256,7 @@ function renderOriginCategory(origin, originID, expanded = undefined) {
     if(expanded === undefined) expanded = origin.Description.length > 0;
 
     if(!single) {
+        if (!expanded) form.classList.add("collapsed");
         entry.append(createIconButton((expanded)?"collapse":"expand", "small alt"));
     }
     entry.append(
@@ -1262,7 +1305,7 @@ function renderAltFormScreen(panel){
 
 function createCollapsingDivider(text, expanded = false, element = "div") {
     if (typeof(text) == "string") text = T(text);
-    return E(element, {class:"collapsable row", autocomplete: "off", onSubmit: "return false;",}, 
+    return E(element, {class:`collapsable row${(!expanded)?" collapsed":""}`, autocomplete: "off", onSubmit: "return false;",}, 
         E("div", {class: "central vcentered persistent label"}, 
             createIconButton((expanded)?"collapse":"expand", "small alt"), 
             text
@@ -1306,6 +1349,7 @@ function makeDragDroppabale (element, dragStart, dragEnd, drop){
 function renderPersonalityPane(){
     let jumper = Chain.Characters[DP.ActiveJumperID];
     let personality = createCollapsingDivider("Personal Identity:", true, "form");
+    personality.classList.add("highlightable");
     let editButton = createIconButton("edit", "smallish", {
         Form: personality, 
         Item: jumper, 
@@ -1610,7 +1654,7 @@ function renderAltFormPanel(){
 function renderAltForm(altForm, deletable = true, showName = true){
     let imperialUnits = localStorage.getItem("unitsImperial") == "true";
 
-    let container = E("form", {class:"tripart_row", autocomplete: "off", onSubmit: "return false;"});
+    let container = E("form", {class:"tripart_row highlightable", autocomplete: "off", onSubmit: "return false;"});
 
     let buttons = E("div", {class: "button_row"});
     
@@ -1701,51 +1745,52 @@ function renderPurchaseSummaryScreen(panel, purchaseType, supplement = undefined
 
 
 function renderJumpNarrative(narrative, JumperName, jump, sectionName = "Narrative Beats:", expand = undefined){
-let narrativePanel = createCollapsingDivider(sectionName,
-    (expand === undefined) ? narrative.Goals || narrative.Challenges || narrative.Accomplishments : expand, "form");
-narrativePanel.append(
-    E("div", {class: "persistent button_row"},
-        createIconButton("edit", "persistent smallish", {
-            Form: narrativePanel, 
-            Item: narrative, 
-            FieldList: jump.FieldList,
-            Deletable: false, 
-            IDPrefix: `${DP.ActiveJumperID}`,
-            Callback: (item, expand) => renderJumpNarrative(item, JumperName, jump, sectionName, expand)
-        }),
-    ),
-    E("div", {class:"tripart_row"},
-        E("div", {},
-            E("div", {class: "label vcentered"}, T("Goals:")),
-            E("div", {
-                class: "userparagraph", 
-                id: `Goals_${DP.ActiveJumperID}`, 
-                placeholder: `What does ${JumperName} hope to achieve here? What experiences are they looking for? What are their desires and needs?`
-            }, 
-                T(narrative.Goals))
-        ), 
-        E("div", {},
-            E("div", {class: "label vcentered"}, T("Challenges:")),
-            E("div", {
-                class: "userparagraph", 
-                id: `Challenges_${DP.ActiveJumperID}`, 
-                placeholder: `Who gets in ${JumperName}'s way? What do they they have to overcome to get what they want? What surprises do they encounter?`
-            }, 
-                T(narrative.Challenges))
-        ), 
-        E("div", {},
-            E("div", {class: "label vcentered"}, T("Accomplishments:")),
-            E("div", {
-                class: "userparagraph", 
-                id: `Accomplishments_${DP.ActiveJumperID}`,
-                placeholder: `What will ${JumperName} have accomplished when it's all said and done? What good and what evil will they have done to this world?`
-            }, 
-                T(narrative.Accomplishments))
+    let narrativePanel = createCollapsingDivider(sectionName,
+        (expand === undefined) ? narrative.Goals || narrative.Challenges || narrative.Accomplishments : expand, "form");
+    narrativePanel.classList.add("highlightable");
+    narrativePanel.append(
+        E("div", {class: "persistent button_row"},
+            createIconButton("edit", "persistent smallish", {
+                Form: narrativePanel, 
+                Item: narrative, 
+                FieldList: jump.FieldList,
+                Deletable: false, 
+                IDPrefix: `${DP.ActiveJumperID}`,
+                Callback: (item, expand) => renderJumpNarrative(item, JumperName, jump, sectionName, expand)
+            }),
+        ),
+        E("div", {class:"tripart_row"},
+            E("div", {},
+                E("div", {class: "label vcentered"}, T("Goals:")),
+                E("div", {
+                    class: "userparagraph", 
+                    id: `Goals_${DP.ActiveJumperID}`, 
+                    placeholder: `What does ${JumperName} hope to achieve here? What experiences are they looking for? What are their desires and needs?`
+                }, 
+                    T(narrative.Goals))
+            ), 
+            E("div", {},
+                E("div", {class: "label vcentered"}, T("Challenges:")),
+                E("div", {
+                    class: "userparagraph", 
+                    id: `Challenges_${DP.ActiveJumperID}`, 
+                    placeholder: `Who gets in ${JumperName}'s way? What do they they have to overcome to get what they want? What surprises do they encounter?`
+                }, 
+                    T(narrative.Challenges))
+            ), 
+            E("div", {},
+                E("div", {class: "label vcentered"}, T("Accomplishments:")),
+                E("div", {
+                    class: "userparagraph", 
+                    id: `Accomplishments_${DP.ActiveJumperID}`,
+                    placeholder: `What will ${JumperName} have accomplished when it's all said and done? What good and what evil will they have done to this world?`
+                }, 
+                    T(narrative.Accomplishments))
+            )
         )
-    )
-);
+    );
 
-return narrativePanel;
+    return narrativePanel;
 
 }
 

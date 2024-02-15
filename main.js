@@ -222,5 +222,5 @@ function setUpMainNav(){
 
 }
 
-setUpMainNav();
 startUp();
+setUpMainNav();

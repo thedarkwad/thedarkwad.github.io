@@ -268,11 +268,7 @@ header nav.controls :is(a, label):hover {
     height:fit-content;
 }
 
-.collapsable:has(>:not(.collapsable)>.expand, >.expand) {
-    row-gap: 0 !important;
-}
-
-.collapsable:has(>:not(.collapsable)>.expand, >.expand) > :not(.persistent), .collapsable:has(>:not(.collapsable)>.expand, >.expand) > :not(.persistent) * {
+.collapsable.collapsed > :not(.persistent), .collapsable.collapsed > :not(.persistent) * {
     max-height: 0 !important;
     height: 0 !important;
     padding-top: 0 !important;
@@ -495,12 +491,23 @@ main.neutral_container {
     grid-column: 1 / -1;
 }
 
-.row.collapsable:not(:has(.collapsable)):hover, 
-.row:has(>*>.save), .collapsable:has(>:not(.collapsable)>.expand, >.expand):has(.save) {
+.tripart_row.highlightable {
+    border-radius: 10px;
+ }
+
+.highlightable:hover, .highlighted {
     background-color: var(--bright_accent_1) !important;
 }
 
-.row.collapsable a.icon.button:hover, .row:has(>*>.save) a.icon.button:hover {
+.collapsable.collapsed:has(.hightlighted) {
+    background-color: var(--bright_accent_1) !important;
+}
+
+.hoverable a.icon.button:hover, .highlighted a.icon.button:hover {
+    background-color: var(--bright_accent_2) !important;
+}
+
+.collapsable.collapsed:has(.hightlighted) a.icon.button:hover{
     background-color: var(--bright_accent_2) !important;
 }
 
@@ -535,10 +542,6 @@ div.button:active {
 
 .neutral_container .central {
     grid-column: 2;
-}
-
-.needs_space:not(:has(.checkboxselect)){
-    margin-top: 0.3rem;
 }
 
 .neutral_container .button_row {
@@ -616,7 +619,7 @@ input[type=checkbox] {
     color:var(--strong_neutral_accent);
 }
 
-.collapsable:has(>:not(.collapsable)>.expand, >.expand) .abbrev {
+.collapsable.collapsed .abbrev {
     overflow: hidden;   
     text-overflow: ellipsis; 
     display: -webkit-box;
@@ -624,7 +627,7 @@ input[type=checkbox] {
     -webkit-box-orient: vertical;
 }
 
-.collapsable:has(>:not(.collapsable)>.expand, >.expand) .abbrev .note {
+.collapsable.collapsed .abbrev .note {
     display:none;
 }
 
@@ -633,11 +636,6 @@ input[type=checkbox] {
     font-weight: bold;
     text-align: left;
 }
-
-.row:has(.vcentered.persistent > .label) {
-    margin-top: 0.5rem;
-}
-
 
 .sublabel {
     font-style: italic;
