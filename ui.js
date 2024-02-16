@@ -1417,7 +1417,8 @@ function addReorderEventListeners(itemDOM, listItem, list, key = "Item"){
         () => {DP[`Dragged${key}Index`] = list.indexOf(listItem); DP[`Dragged${key}`] = itemDOM}, 
         () => {delete DP[`Dragged${key}Index`]; delete DP[`Dragged${key}`];}, 
         () => {
-            if(`Dragged${key}Index` in DP){
+            if (`Dragged${key}Index` in DP) {
+                console.log(DP);
                 let newI = 
                     (DP[`Dragged${key}Index`] < list.indexOf(listItem)) ? (list.indexOf(listItem)-1) : list.indexOf(listItem);
                 list.splice(newI, 0, list.splice(DP[`Dragged${key}Index`], 1)[0]);
@@ -2435,7 +2436,17 @@ function renderChainSettingsScreen(panel) {
                 Chain.PurchaseCategories[PurchaseTypes.Perk].findIndex((c) => (c.Name == item.Name)), 1
             );
         }, 
-        () => {}
+        (item, change) => {
+            for (let j of Chain.Jumps) {
+                for (let p of j.Purchases) {
+                    if (p.Type == PurchaseTypes.Supplement) continue;
+                    let i = p.Category.indexOf(change.Name);
+                    if (i >= 0) {
+                        p.Category[i] = item.Name;
+                    }
+                }
+            }
+        }
     );
 
     let itemCategorySelect = new ComplexConfigMenu("Item Categories:", 
@@ -2450,7 +2461,17 @@ function renderChainSettingsScreen(panel) {
             Chain.PurchaseCategories[PurchaseTypes.Item].findIndex((c) => (c.Name == item.Name)), 1
         );
     }, 
-    () => {}
+    (item, change) => {
+        for (let j of Chain.Jumps) {
+            for (let p of j.Purchases) {
+                if (p.Type == PurchaseTypes.Supplement) continue;
+                let i = p.Category.indexOf(change.Name);
+                if (i >= 0) {
+                    p.Category[i] = item.Name;
+                }
+            }
+        }
+    }
     );
 
     topMenu.append(basicSettings);
@@ -2502,8 +2523,18 @@ function renderChainSupplement(supp){
         (item) => {
             supp.PurchaseCategories.splice( supp.PurchaseCategories.findIndex((c) => (c.Name == item.Name)), 1 );
         }, 
-        () => {}
-    );
+        (item, change) => {
+            for (let j of Chain.Jumps) {
+                for (let p of j.Purchases) {
+                    if (!p.Supplement || p.Supplement.ID != supp.ID) continue;
+                    let i = p.Category.indexOf(change.Name);
+                    if (i >= 0) {
+                        p.Category[i] = item.Name;
+                    }
+                }
+            }
+        }
+        );
 
     panel.append(
         E("div", {class: "row split"},

@@ -427,6 +427,7 @@ class ComplexConfigMenu {
         this.New = newElementFunction;
         this.Delete = deleteFunction;
         this.UpdateCallback = updateCallback;
+        this.Label = label;
 
         this.Container = E("div", {class:"complexconfig"}, 
             E("div", {class: "label"}, T(label)), 
@@ -536,6 +537,9 @@ class ComplexConfigMenu {
             let input = this.CreateInput(field);
             if (this.FieldList[field].Step) input.setAttribute("step", this.FieldList[field].Step);
             input.addEventListener("input", () => {
+                let oldField = item[field];
+                let change = {};
+                change[field] = oldField;
                 if (this.FieldList[field].InputType == "checkbox") {
                     item[field]  = entry.Inputs[field].checked;
                 } else {
@@ -546,7 +550,7 @@ class ComplexConfigMenu {
                     item[field] = Math.floor(item[field]);
                 }
 
-                this.UpdateCallback(item);
+                this.UpdateCallback(item, change);
             });
             if (field == "Name") {
                 input.addEventListener("input", () => {
@@ -586,6 +590,10 @@ class ComplexConfigMenu {
         
         this.Entries[index] = entry;
         this.EntriesContainer.append(newEntryDOM);
+
+        if("indexOf" in this.List){
+            addReorderEventListeners(newEntryDOM, item, this.List, this.Label);
+        } 
         
     }
 }
