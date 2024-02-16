@@ -163,7 +163,7 @@ function renderPurchase(purchase, updateCallback, expand = false, abbreviated = 
     if (!expand) displayContainer.classList.add("collapsed");
 
     let isSupplement = purchase.Type == PurchaseTypes.Supplement;
-    let subtypeName = DP.ActiveJump.PurchaseSubTypes[purchase.Subtype].Name;
+    let subtypeName = purchase.Jump.PurchaseSubTypes[+purchase.Subtype].Name;
     if(!abbreviated)
         addReorderEventListeners(displayContainer, 
             purchase, DP.ActiveJump.Purchases, "Purchase");
@@ -186,7 +186,7 @@ function renderPurchase(purchase, updateCallback, expand = false, abbreviated = 
             Item: purchase, 
             FieldList: purchase.FieldList,
             Deletable: true,
-            IDPrefix: `${DP.ActiveJump.ID}_${purchase.ID}`,
+            IDPrefix: `${purchase.Jump.ID}_${purchase.ID}`,
             Callback: (p, expand) => {
                 updateCallback();
                 return renderPurchase(p, updateCallback, expand, abbreviated);
@@ -195,7 +195,7 @@ function renderPurchase(purchase, updateCallback, expand = false, abbreviated = 
     ));
     let durationRow = E("div", {class: "note vcentered central"});
     if(!abbreviated) 
-        durationRow.setAttribute('id',  ((isSupplement)? "Duration" : "Temporary") + `_${DP.ActiveJump.ID}_${purchase.ID}` );
+        durationRow.setAttribute('id',  ((isSupplement)? "Duration" : "Temporary") + `_${purchase.Jump.ID}_${purchase.ID}` );
     if (isSupplement) {
         let jumpNumber = DP.ActiveJump.JumpNumber;
         let perkJumpNumber = purchase.Jump.JumpNumber;
@@ -227,13 +227,13 @@ function renderPurchase(purchase, updateCallback, expand = false, abbreviated = 
 
     let costPane = E("div", {class: "persistent vcentered central"}, 
         E("span", {class:"sublabel"}, T("Cost:\u00A0")), 
-        E("span", {id: `Value_${DP.ActiveJump.ID}_${purchase.ID}`},
+        E("span", {id: `Value_${purchase.Jump.ID}_${purchase.ID}`},
             T(`${purchase.Cost}`)), 
-        E("Span", (isSupplement)?{}:{id: `Currency_${DP.ActiveJump.ID}_${purchase.ID}`}, 
+        E("Span", (isSupplement)?{}:{id: `Currency_${purchase.Jump.ID}_${purchase.ID}`}, 
             T(`\u00A0${currencyAbbrev}\u00A0`))
         );
     
-    let modifierNote = E("span", {class: "note", id:`CostModifier_${DP.ActiveJump.ID}_${purchase.ID}`})
+    let modifierNote = E("span", {class: "note", id:`CostModifier_${purchase.Jump.ID}_${purchase.ID}`})
     if(purchase.CostModifier != CostModifiers.Full)
         modifierNote.append(T(`(value of ${purchase.Value})`)); 
     costPane.append(modifierNote);
@@ -250,15 +250,15 @@ function renderPurchase(purchase, updateCallback, expand = false, abbreviated = 
     }
 
     costPane.append(E("span", {class: "divider"}, T("|")),
-         E("span", {class: "sublabel", id: `Category_${DP.ActiveJump.ID}_${purchase.ID}`}, T(categoryString)), 
-         E("span", {class: "sublabel", id: `${fixedSubtype ? "X_" : ""}Subtype_${DP.ActiveJump.ID}_${purchase.ID}`}, T(`\u00A0${subtypeName}\u00A0`))
+         E("span", {class: "sublabel", id: `Category_${purchase.Jump.ID}_${purchase.ID}`}, T(categoryString)), 
+         E("span", {class: "sublabel", id: `${fixedSubtype ? "X_" : ""}Subtype_${purchase.Jump.ID}_${purchase.ID}`}, T(`\u00A0${subtypeName}\u00A0`))
     );
 
     costPane.append(createIconButton((expand)?"collapse":"expand", "small alt"));
     
     displayContainer.append(name, costPane, buttonRow);
     if (purchase.Type == PurchaseTypes.Companion) {
-        let companions = E("div", {id: `CompanionIDs_${DP.ActiveJump.ID}_${purchase.ID}`});
+        let companions = E("div", {id: `CompanionIDs_${purchase.Jump.ID}_${purchase.ID}`});
             companions.append(
                 E("span", {placeholder: "No one imported!", class:"note"}, 
                 T(`${purchase.CompanionIDs.map( (id) => Chain.Characters[id].Name).join(", ")}`))
@@ -266,25 +266,25 @@ function renderPurchase(purchase, updateCallback, expand = false, abbreviated = 
         displayContainer.append(companions, description);
 
         let pointsRow = E("div", {class: "central needs_space vcentered"});
-        let allowances = E("span", {id: `Allowances_${DP.ActiveJump.ID}_${purchase.ID}`, title: "Freely spendable points"}, 
+        let allowances = E("span", {id: `Allowances_${purchase.Jump.ID}_${purchase.ID}`, title: "Freely spendable points"}, 
             E("span", {class:"label needs_space"}, T("Allowance: ")), 
             E("span", {placeholder: "None"}, 
                 T(`${Object.entries(purchase.Allowances).map( 
-                    ([c, total]) => `${total} ${DP.ActiveJump.Currencies[c].Abbrev}`
+                    ([c, total]) => `${total} ${purchase.Jump.Currencies[c].Abbrev}`
                 ).join(", ")}`))
         );
 
         let stipends = [];
-        for (let c in DP.ActiveJump.Currencies) {
+        for (let c in purchase.Jump.Currencies) {
             let cStipendContainer = 
-                E("span", {id: `Stipends_${c}_${DP.ActiveJump.ID}_${purchase.ID}`, style: {marginLeft:"0.5rem"},  title: "Points to be spent in a particular category"});
+                E("span", {id: `Stipends_${c}_${purchase.Jump.ID}_${purchase.ID}`, style: {marginLeft:"0.5rem"},  title: "Points to be spent in a particular category"});
             if (Object.keys(purchase.Stipends[c]).length > 0)  cStipendContainer.append(
                 E("span", {class: "label needs_space"}, 
-                    T(`${DP.ActiveJump.Currencies[c].Abbrev} Stipends: `)
+                    T(`${purchase.Jump.Currencies[c].Abbrev} Stipends: `)
                 ), 
                 E("span", {placeholder: "None"}, 
                 T(`${Object.entries(purchase.Stipends[c]).map(
-                    ([type, stipend]) => `${stipend} for ${DP.ActiveJump.PurchaseSubTypes[type].Name.toLowerCase()}s`
+                    ([type, stipend]) => `${stipend} for ${purchase.Jump.PurchaseSubTypes[type].Name.toLowerCase()}s`
                 ).join(", ")}`))
             );
             stipends.push(cStipendContainer);
@@ -294,7 +294,7 @@ function renderPurchase(purchase, updateCallback, expand = false, abbreviated = 
         displayContainer.append(pointsRow);
 
     } else {
-        let tags = E("div", {id: `Tags_${DP.ActiveJump.ID}_${purchase.ID}`, class: "note"});
+        let tags = E("div", {id: `Tags_${purchase.Jump.ID}_${purchase.ID}`, class: "note"});
         if (purchase.Tags.length > 0) {
             tags.append(
                 T(`${(purchase.Tags.length > 1)?"Tags:" : "Tag:"} ${purchase.Tags.join(", ")}`));
@@ -1418,7 +1418,6 @@ function addReorderEventListeners(itemDOM, listItem, list, key = "Item"){
         () => {delete DP[`Dragged${key}Index`]; delete DP[`Dragged${key}`];}, 
         () => {
             if (`Dragged${key}Index` in DP) {
-                console.log(DP);
                 let newI = 
                     (DP[`Dragged${key}Index`] < list.indexOf(listItem)) ? (list.indexOf(listItem)-1) : list.indexOf(listItem);
                 list.splice(newI, 0, list.splice(DP[`Dragged${key}Index`], 1)[0]);
