@@ -129,7 +129,7 @@ function createIconButton(type, modifiers = "", params = {}){
             button.addEventListener("click", ()=>{
                 let element = params.Callback();
                 let input = element.querySelector("input");
-                if (input) input.focus();
+                if (input) {input.focus(); toggleHighlighting(input);}
                 element.scrollIntoView();
             }, false);
             break;
