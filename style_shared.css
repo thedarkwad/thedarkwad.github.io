@@ -503,7 +503,7 @@ main.neutral_container {
     background-color: var(--bright_accent_1) !important;
 }
 
-.hoverable a.icon.button:hover, .highlighted a.icon.button:hover {
+.highlightable a.icon.button:hover, .highlighted a.icon.button:hover {
     background-color: var(--bright_accent_2) !important;
 }
 
