@@ -169,11 +169,11 @@ function renderPurchase(purchase, updateCallback, expand = false, abbreviated = 
             purchase, DP.ActiveJump.Purchases, "Purchase");
 
     let name = E("span", 
-        {class: `persistent label${abbreviated?" abbrev":""}`, id: `Name_${DP.ActiveJump.ID}_${purchase.ID}`})
+        {class: `persistent label${abbreviated?" abbrev":""}`, id: `Name_${purchase.Jump.ID}_${purchase.ID}`})
     if(abbreviated) name.append(createIconButton((expand)?"collapse":"expand", "small alt"))
     name.append(E("span", {placeholder: "[nameless purchase]"}, T(purchase.Name)));
 
-    let description = E("div", {class: "central userparagraph faint", id: `Description_${DP.ActiveJump.ID}_${purchase.ID}`}, 
+    let description = E("div", {class: "central userparagraph faint", id: `Description_${purchase.Jump.ID}_${purchase.ID}`}, 
         T(purchase.Description));
 
     let buttonRow = E("div", {class: "persistent button_row"});
@@ -452,6 +452,7 @@ function assembleNumericOptions(numericSelect, item, fieldInfo){
 function swapInInputs(form, item, fieldList, renderCallback, idPrefix, deletable = true){
     let inputList = {};
     focused = false;
+    console.log(idPrefix);
     for (let field in fieldList) {
         let inputContainer = form.querySelector(`#${field}_${idPrefix}`);
         if(!inputContainer) continue;
