@@ -225,7 +225,7 @@ function renderPurchase(purchase, updateCallback, expand = false, abbreviated = 
 
     let currencyAbbrev = (isSupplement) ? purchase.Supplement.Currency : purchase.Jump.Currencies[purchase.Currency].Abbrev;
 
-    let costPane = E("div", {class: "persistent vcentered central"}, 
+    let costPane = E("div", {class: "persistent central"}, 
         E("span", {class:"sublabel"}, T("Cost:\u00A0")), 
         E("span", {id: `Value_${purchase.Jump.ID}_${purchase.ID}`},
             T(`${purchase.Cost}`)), 
@@ -349,7 +349,7 @@ function renderDrawback(drawback, expand = false){
 
     let currencyAbbrev = (drawback.Jump)?DP.ActiveJump.Currencies[drawback.Currency].Abbrev:"CP";
 
-    let costPane = E("div", {class: "persistent vcentered central"}, 
+    let costPane = E("div", {class: "persistent central"}, 
         E("span", {class:"sublabel"}, T("Value:\u00A0")), 
         E("span", {id: `Value_${IDSuffix}`},
             T(`${drawback.Cost}`)
@@ -1656,7 +1656,7 @@ function renderAltForm(altForm, deletable = true, showName = true){
 
     let container = E("form", {class:"tripart_row highlightable", autocomplete: "off", onSubmit: "return false;"});
 
-    let buttons = E("div", {class: "button_row"});
+    let buttons = E("div", {class: ""});
     
     if (deletable) 
         buttons.append(createIconButton("delete", "smallish", {Form: container, Item: altForm}));
@@ -1680,8 +1680,9 @@ function renderAltForm(altForm, deletable = true, showName = true){
     if(showName) leftColumn.append(
         E("div", {class: "label vcentered", style:{justifyContent: "right"}}, T("Name:")),
         E("div", {id:`Name_${DP.ActiveJump.ID}_${altForm.ID}`, class: "vcentered", 
-            style:{gridColumn: "span 3"},
-            placeholder: "[nameless body]"}, T(altForm.Name)));
+            style:{gridColumn: "span 2"},
+            placeholder: "[nameless body]"}, T(altForm.Name)), 
+            buttons);
 
     leftColumn.append(
         E("div", {class: "label vcentered", style:{justifyContent: "right"}}, T("Height:")),
@@ -1723,8 +1724,8 @@ function renderAltForm(altForm, deletable = true, showName = true){
         )
 
         ), 
-        E("div", {},
-        buttons
+        E("div", {class: "empty"},
+        // buttons
 
         )
     );
@@ -2151,10 +2152,26 @@ function populateItineraryMainPanel(reset = false){
 
 }
 
+function renderOriginalBody(expand = true){
+    let jumper = Chain.Characters[DP.ActiveJumperID];
+    let originalForm = createCollapsingDivider("Original Body:", expand, "form");
+    originalForm.classList.add("highlightable");
+    let editButton = createIconButton("edit", "smallish", {
+        Form: originalForm, 
+        Item: jumper.OriginalForm, 
+        FieldList: jumper.OriginalForm.FieldList,
+        IDPrefix: `${DP.ActiveJump.ID}_${jumper.OriginalForm.ID}`,
+        Callback: () => {
+            return renderOriginalBody(expand);
+        }
+    });
+    originalForm.append(E("div", {class: "button_row"}, editButton));
+    originalForm.append(renderAltForm(jumper.OriginalForm, false, false));
+    return originalForm;
+}
+
 function renderJumperOverview(panel){
     panel.replaceChildren();
-
-    let jumper = Chain.Characters[DP.ActiveJumperID];
 
     panel.append(renderJumperCharacteristic("Name"));
     panel.append(renderJumperCharacteristic("Gender"));
@@ -2164,11 +2181,9 @@ function renderJumperOverview(panel){
 
     panel.append(E("div", {class:"hrule"}));
 
-    let originalForm = createCollapsingDivider("Original Body:", true);
-    originalForm.append(renderAltForm(jumper.OriginalForm, false, false));
 
 
-    panel.append(originalForm, renderPersonalityPane());
+    panel.append(renderOriginalBody(), renderPersonalityPane());
 
 }
 

@@ -364,8 +364,7 @@ header nav.controls :is(a, label):hover {
 main.neutral_container {
     max-width: min(60rem, 100%);
     flex-basis: max-content;
-    flex:1;
-    min-width: 35rem;
+    flex:1 1 35rem;
     background-color: var(--faint_neutral_accent);
     border-radius: 20px;
     display:grid;
@@ -413,12 +412,26 @@ main.neutral_container {
 }
 
 .neutral_container .tripart_row {
-    display:grid;
+    display:flex;
+    row-gap: 0.5rem;
+    justify-content: space-between;
+    align-items: start;
+    align-content: flex-start;
+    flex-flow: row wrap;
     grid-column: 1 / -1;
-    grid-template-columns: 1fr 1fr 1fr;
     margin-top: 1rem;
     column-gap: 0.5rem;
 }
+
+.neutral_container .tripart_row > *{
+    flex: 1 1 15rem;
+}
+
+.neutral_container .tripart_row > div.empty{
+    flex: 10 0 0;
+}
+
+
 
 .neutral_container .tripart_row .grid{
     overflow-wrap:normal;
@@ -538,7 +551,6 @@ div.button:active {
 :has(>.nonzero_numeric:empty){
     display:none;
 }
-
 
 .neutral_container .central {
     grid-column: 2;

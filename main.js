@@ -5,7 +5,7 @@ let secondsBetweenAutosaves = 60;
 
 
 function saveLocally(){
-    localStorage.setItem("chainDump", JSON.stringify(Chain));
+    localStorage.setItem("chainDump", JSON.stringify(Chain, null, 1));
     localStorage.setItem("unusedID", unusedID); 
 }
 
@@ -92,7 +92,7 @@ function setupUserPreferences() {
 function exportFile(){
     URL.revokeObjectURL(chainDataURL);
     let fileName = (Chain.Name ? Chain.Name : "UntitledChain").replace(/[^-._~\/\?#\[\]@!$&'\(\)\*\+,;=a-zA-Z0-9 ]/g, '_') + ".json";
-    let file = new File([`[${unusedID}, ${JSON.stringify(Chain)}]`], 
+    let file = new File([`[${unusedID}, ${JSON.stringify(Chain, null, 1)}]`], 
         fileName, {type: "application/json"});
     chainDataURL = URL.createObjectURL(file);
     var link = E("a", {href: chainDataURL, download: fileName}); // Or maybe get it from the current document
@@ -236,6 +236,8 @@ function setUpMainNav(){
     setupSettingsDropdown(document.getElementById("settings_dropdown").querySelector(".dropdown_body"));
 
 }
+
+// LOCAL SAVE WARNING 
 
 startUp();
 setUpMainNav();
