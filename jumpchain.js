@@ -910,8 +910,7 @@ class Jump {
 
         if(Chain.Bank.Enabled) budget[0] -= this.BankDeposits[jumperID];
 
-        for (let sub in this.SubsystemAccess[jumper.ID]){
-
+        for (let sub in this.SubsystemAccess[jumper.ID]) {
             stipends[DP.ActiveJump.PurchaseSubTypes[sub].Currency][sub] += this.SubsystemAccess[jumper.ID][sub].Stipend;
         }
 

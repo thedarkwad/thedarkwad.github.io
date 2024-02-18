@@ -421,13 +421,14 @@ class OptionalNumeric {
 }
 
 class ComplexConfigMenu {
-    constructor(label, fieldList, list, newElementFunction, deleteFunction, updateCallback){
+    constructor(label, fieldList, list, newElementFunction, deleteFunction, updateCallback, draggable = true){
         this.FieldList = fieldList;
         this.List = list;
         this.New = newElementFunction;
         this.Delete = deleteFunction;
         this.UpdateCallback = updateCallback;
         this.Label = label;
+        this.Draggable = draggable;
 
         this.Container = E("div", {class:"complexconfig"}, 
             E("div", {class: "label"}, T(label)), 
@@ -591,7 +592,7 @@ class ComplexConfigMenu {
         this.Entries[index] = entry;
         this.EntriesContainer.append(newEntryDOM);
 
-        if("indexOf" in this.List){
+        if("indexOf" in this.List && this.Draggable){
             addReorderEventListeners(newEntryDOM, item, this.List, this.Label);
         } 
         

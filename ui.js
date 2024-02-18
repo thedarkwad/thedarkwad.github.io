@@ -452,7 +452,6 @@ function assembleNumericOptions(numericSelect, item, fieldInfo){
 function swapInInputs(form, item, fieldList, renderCallback, idPrefix, deletable = true){
     let inputList = {};
     focused = false;
-    console.log(idPrefix);
     for (let field in fieldList) {
         let inputContainer = form.querySelector(`#${field}_${idPrefix}`);
         if(!inputContainer) continue;
@@ -1927,18 +1926,20 @@ function renderSubtypeConfiguration(budgetbar){
                 replacementSubtype = st;
         }
 
-        if (i.Subsystem) {
-            for (let j of Chain.Characters){
-                if (i in DP.ActiveJump.SubsystemAccess[j.ID][i])
-                    delete DP.ActiveJump.SubsystemAccess [j.ID][i];
+        if (item.Subsystem) {
+            for (let jID in Chain.Characters){
+                if (i in DP.ActiveJump.SubsystemAccess[jID])
+                    delete DP.ActiveJump.SubsystemAccess[jID][i];
             }
         }
 
         for (let j = 0; j < DP.ActiveJump.Purchases.length; j++) {
             let p = DP.ActiveJump.Purchases[j];
             if (p.Subtype == i) {
-                if (i.Subsystem) {p.Unregister(); j--; continue;}
-                p.Subtype = replacementSubtype; continue;
+                if (item.Subsystem) {p.Unregister(); j--; continue;}
+                p.Subtype = replacementSubtype;
+                p.Type = DP.ActiveJump.PurchaseSubTypes[replacementSubtype].Type;
+                continue;
             }
             if (p.Type == PurchaseTypes.Companion) {
                 for (let c in DP.ActiveJump.Currencies){
@@ -1949,12 +1950,19 @@ function renderSubtypeConfiguration(budgetbar){
         }
         budgetUpdate();
     },
-    () => {
+    (item) => {
         document.getElementById("main_panel_tabs").replaceWith(
             renderItineraryTabs(document.getElementById("main_content_panel"), false)
         );
+        let i = DP.ActiveJump.PurchaseSubTypes.indexOf(item);
+        for (let j = 0; j < DP.ActiveJump.Purchases.length; j++) {
+            let p = DP.ActiveJump.Purchases[j];
+            if (p.Subtype == i) {
+                p.Type = item.Type;
+            }
+        }
         budgetUpdate();
-    });
+    }, false);
 }
 
 function renderJumpConfigScreen(panel){
