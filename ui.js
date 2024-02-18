@@ -1174,7 +1174,7 @@ function renderJumperCharacteristic(field, labelText, expanded) {
     if (!single && !expanded) expanded = jumper[field].Description.length > 0;
 
     let form = E("form", {
-        class: `row compact highlightable`,
+        class: `row compact highlightable single`,
         autocomplete: "off", onSubmit: "return false;"}
     );
     
@@ -1189,7 +1189,7 @@ function renderJumperCharacteristic(field, labelText, expanded) {
 
     if (!single) form.classList.add("collapsable");
     let entryField = (single) ? field : field + "_Summary";
-    let label = E("span", {class: "persistent vcentered label", style:{justifyContent: "right"}}, T(`${labelText}:`));
+    let label = E("span", {class: "persistent vcentered label right_label"}, T(`${labelText}:`));
     let entry =  E("span", {class: "vcentered persistent"}, 
         E("span", {id: `${entryField}_${DP.ActiveJumperID}`}, T(value)),
     );
@@ -1238,9 +1238,10 @@ function renderOriginCategory(origin, originID, expanded = undefined) {
         class: `row compact highlightable`,
         autocomplete: "off", onSubmit: "return false;",
         id:`jump${DP.ActiveJump.ID}_${DP.ActiveJumperID}_${originID}_form`});
-    if(!single) form.classList.add("collapsable");
+    if (!single) form.classList.add("collapsable");
+    form.classList.add("single");
 
-    let label = E("span", {class: "persistent vcentered label", style:{justifyContent: "right"}}, 
+    let label = E("span", {class: "persistent vcentered label right_label"}, 
         T(`${DP.ActiveJump.OriginCategories[originID].Name}:`));
     let entry =  E("span", {class: "vcentered persistent"}, 
         E("span", {id: `Name_${DP.ActiveJump.ID}_${originID}`}, T(origin.Name)),
@@ -1677,26 +1678,26 @@ function renderAltForm(altForm, deletable = true, showName = true){
     container.append(leftColumn);
 
     if(showName) leftColumn.append(
-        E("div", {class: "label vcentered", style:{justifyContent: "right"}}, T("Name:")),
+        E("div", {class: "label vcentered right_label"}, T("Name:")),
         E("div", {id:`Name_${DP.ActiveJump.ID}_${altForm.ID}`, class: "vcentered", 
             style:{gridColumn: "span 2"},
             placeholder: "[nameless body]"}, T(altForm.Name)), 
             buttons);
 
     leftColumn.append(
-        E("div", {class: "label vcentered", style:{justifyContent: "right"}}, T("Height:")),
+        E("div", {class: "label vcentered right_label"}, T("Height:")),
         E("div", {class: "vcentered"},
             E("span", {id:`Height_${DP.ActiveJump.ID}_${altForm.ID}`}, T(displayHeight(altForm.Height))), 
             T(`\u00A0${(imperialUnits)? "in" : "cm"}`)
         ),
-        E("div", {class: "label vcentered", style:{justifyContent: "right"}}, T("Sex:")),
+        E("div", {class: "label vcentered right_label"}, T("Sex:")),
         E("span", {id:`Sex_${DP.ActiveJump.ID}_${altForm.ID}`, class: "vcentered"}, T(altForm.Sex)),
-        E("div", {class: "label vcentered", style:{justifyContent: "right"}}, T("Weight:")),
+        E("div", {class: "label vcentered right_label"}, T("Weight:")),
         E("div", {class: "vcentered"},
             E("span", {id:`Weight_${DP.ActiveJump.ID}_${altForm.ID}`}, T(altForm.Weight)),
             T(`\u00A0${(imperialUnits)? "lbs" : "kg"}`),
         ),
-        E("div", {class: "label vcentered", style:{justifyContent: "right"}}, T("Species:")),
+        E("div", {class: "label vcentered right_label"}, T("Species:")),
         E("span", {class: "vcentered", id:`Species_${DP.ActiveJump.ID}_${altForm.ID}`}, T(altForm.Species)),    
     ); 
 
@@ -1820,6 +1821,7 @@ function renderJumpMetadata() {
         );
     
     let container = E("form", {autocomplete: "off", onSubmit: "return false;", class: "row"});
+    container.classList.add("single");
     let editButton =  createIconButton("edit", "small", {
         Form: container, 
         Item: DP.ActiveJump, 
@@ -1864,7 +1866,7 @@ function renderJumpMetadata() {
     container.append(
         E("div", {class: "central label"}, T("Jump Info:"), editButton),
         E("div"),
-        E("span", {class: "label vcentered", style: {justifyContent: "right"}}, T("Length: ")), 
+        E("span", {class: "label vcentered right_label"}, T("Length: ")), 
         E("span", {}, 
             E("span", {id: `Length_Years_${DP.ActiveJump.ID}`}, T(DP.ActiveJump.Length.Years)),
             T(" Years, "), 
@@ -1873,13 +1875,13 @@ function renderJumpMetadata() {
             E("span", {id: `Length_Days_${DP.ActiveJump.ID}`}, T(DP.ActiveJump.Length.Days)),
             T(" Days") 
         ),  E("div"),
-        E("span", {class: "label vcentered", style: {justifyContent: "right"}}, T("URL:")), 
+        E("span", {class: "label vcentered right_label"}, T("URL:")), 
         E("span", {id: `URL_${DP.ActiveJump.ID}`}, 
             jumpdocLink), E("div"),
-        E("span", {class: "label vcentered", style: {justifyContent: "right"}}, T("Drawback Exclusions:")), 
+        E("span", {class: "label vcentered right_label"}, T("Drawback Exclusions:")), 
         E("span", {id: `ExcludedDrawbacks_${DP.ActiveJump.ID}`},
             T(DP.ActiveJump.ExcludedDrawbacks.length > 0 ? "Some" : "None")), E("div"),    
-        E("span", {class: "label vcentered", style: {justifyContent: "right"}}, T("Supplement:")), 
+        E("span", {class: "label vcentered right_label"}, T("Supplement:")), 
         E("span", {id: `Supplement_${DP.ActiveJump.ID}`}, 
             supplementText), 
     )
@@ -2565,19 +2567,19 @@ function renderChainSupplement(supp){
                 E("span", {id: `Name_${supp.ID}`}, T(supp.Name)), 
                 E("span", {style: {marginLeft: "auto"}}, deleteButton, editButton)
             ),
-            E("span", {class: "vcentered label", style: {justifyContent: "right", gridColumn: "1"}}, T("Type:")), 
+            E("span", {class: "vcentered label right_label", style: {gridColumn: "1"}}, T("Type:")), 
             E("span", {class: "vcentered central", id: `ItemLike_${supp.ID}`} ,
                 T( (supp.ItemLike) ? "Item Supplement" : "Perk Supplement" )
             ),
-            E("span", {class: "vcentered label", style: {justifyContent: "right", gridColumn: "1"}}, T("URL:")), 
+            E("span", {class: "vcentered label right_label", style: {gridColumn: "1"}}, T("URL:")), 
             E("span", {class: "vcentered central", id: `URL_${supp.ID}`} ,
                 jumpdocLink
             ),
-            E("span", {class: "vcentered label", style: {justifyContent: "right", gridColumn: "1"}}, T("Companion Access:")), 
+            E("span", {class: "vcentered label right_label", style: {gridColumn: "1"}}, T("Companion Access:")), 
             E("span", {id: `CompanionAccess_${supp.ID}`} ,
                 T(companionAccess)
             ),
-            E("span", {class: "vcentered label", style: {justifyContent: "right", gridColumn: "1"}}, T("Currency Abbrev:")),
+            E("span", {class: "vcentered label right_label", style: {gridColumn: "1"}}, T("Currency Abbrev:")),
             E("span", {id: `Currency_${supp.ID}`} ,
                 T(supp.Currency)
             ),

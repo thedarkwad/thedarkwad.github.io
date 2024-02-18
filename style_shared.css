@@ -373,6 +373,10 @@ main.neutral_container {
     grid-template-columns: 1fr 3fr 5rem;
 }
 
+.right_label {
+    justify-content: right;
+}
+
 .neutral_container .row {
     display:grid;
     grid-column: 1 / -1;
@@ -380,6 +384,29 @@ main.neutral_container {
     border-radius: 8px;
     row-gap: inherit;
 }
+
+@media (max-width:480px) {
+    main.neutral_container {
+        grid-template-columns: 1fr;
+    }    
+
+    .right_label:not(.single *) {
+        justify-content: left;
+    }
+
+    .label.central:not(.single *) {
+        display: flex;
+        justify-content: center;
+    }
+
+    
+    .row.single {
+        grid-template-columns: 1fr 3fr 5rem;
+        column-gap: 0.5rem;
+    }
+
+}
+
 
 .panel .row:not(.row .row), .panel > .tripart_row:not(.row .tripart_row), .flexrow {
     padding-left: 0.25rem;
@@ -697,7 +724,7 @@ input[type=checkbox] {
 }
 
 .placeholder{
-    display:none;
+    display: none !important;
     text-align: right;
 }
 
