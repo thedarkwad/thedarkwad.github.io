@@ -729,7 +729,7 @@ input[type=checkbox] {
 }
 
 div:not(:has(.edit, .save)) .row .placeholder{
-    display: grid;
+    display: grid !important;
 }
 
 
