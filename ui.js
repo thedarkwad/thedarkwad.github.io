@@ -925,7 +925,7 @@ function renderSubsystemScreen(panel, subsystem){
             DP.ActiveJump.PurchaseSubTypes[subsystem].Type);
         accessPerk.Name = `[untitled ${DP.ActiveJump.PurchaseSubTypes[subsystem].Name.toLowerCase()}]`;
         stipendInput.value = 0;
-        DP.ActiveJump.SubsystemAccess[DP.ActiveJumperID][subsystem] = {Purchase: accessPerk, 
+        DP.ActiveJump.SubsystemAccess[DP.ActiveJumperID][subsystem] = {PurchaseID: accessPerk.ID, 
             Stipend: 0}
         accessPerkDisplay.append(renderPurchase(accessPerk, () => {
             let accessGranted = subsystem in DP.ActiveJump.SubsystemAccess[DP.ActiveJumperID]; 
@@ -949,7 +949,14 @@ function renderSubsystemScreen(panel, subsystem){
         stipendInput.value = DP.ActiveJump.SubsystemAccess[DP.ActiveJumperID][subsystem].Stipend;
         currencySelect.value = DP.ActiveJump.SubsystemAccess[DP.ActiveJumperID][subsystem].Currency;
         head.replaceChildren(stipendPanel);
-        accessPerk = DP.ActiveJump.SubsystemAccess[DP.ActiveJumperID][subsystem].Purchase;
+
+        let accessPerk;
+        for (let p of DP.ActiveJump.Purchases) {
+            if (p.ID == DP.ActiveJump.SubsystemAccess[DP.ActiveJumperID][subsystem].PurchaseID) {
+                accessPerk = p;
+            }
+        }
+
         accessPerkDisplay.append(renderPurchase(accessPerk, () => {
             let accessGranted = subsystem in DP.ActiveJump.SubsystemAccess[DP.ActiveJumperID]; 
             budgetUpdate();

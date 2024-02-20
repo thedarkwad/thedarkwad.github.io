@@ -269,7 +269,7 @@ class ChainClass {
         let drawbackTally = {General: 0, Items: 0, Companions: 0};
         for (let i in this.Drawbacks) {
             let drawback = this.Drawbacks[i];
-            if (jump.ExcludedDrawbacks.includes(drawback.ID)) continue;
+            if (jump.ExcludedDrawbacks.includes(+drawback.ID)) continue;
             if (drawback.AutoRevoke > 0 && jump.JumpNumber > drawback.AutoRevoke) continue;
             drawbackTally.General += drawback.Cost;
             drawbackTally.Companions += drawback.CompanionStipend;
@@ -353,6 +353,7 @@ class Purchase {
         }
 
 
+
     }
 
     Deserialize(json) {
@@ -412,7 +413,7 @@ class Purchase {
         let jump = Chain.Jump(this.JumpID);
         jump.Purchases.splice(jump.Purchases.indexOf(this), 1);
         for (let i in jump.SubsystemAccess[this.JumperID]){
-            if (jump.SubsystemAccess[this.JumperID][i].Purchase.ID == this.ID) {
+            if (jump.SubsystemAccess[this.JumperID][i].PurchaseID == this.ID) {
                 delete jump.SubsystemAccess[this.JumperID][i];
             }
         }
@@ -661,6 +662,16 @@ class Jump {
         this.Purchases = this.Purchases.map((p) => {return new Purchase(p.JumperID, p.Type).Deserialize(p);});
         this.PhysicalForms = this.PhysicalForms.map((f) => {return new AltForm(f.JumperID).Deserialize(f);});
         this.Drawbacks = this.Drawbacks.map((d) => {return new Drawback(d.JumperID, d.Type).Deserialize(d);});
+
+        for (let charID in this.SubsystemAccess) {
+            for (let i in this.SubsystemAccess[charID]) {
+                if (this.SubsystemAccess[charID][i].Purchase) {
+                    this.SubsystemAccess[charID][i].PurchaseID = this.SubsystemAccess[charID][i].Purchase.ID;
+                    delete this.SubsystemAccess[charID][i].Purchase;
+                }
+            }
+        } 
+
         return this;
     }
 
@@ -881,8 +892,8 @@ class Jump {
                 delete this.Purchases[i];
                 i--;
             } 
-            if (p.Type == PurchaseTypes.Companion && p.CompanionIDs.includes(jumperID)) {
-                p.CompanionIDs.splice(p.CompanionIDs.indexOf(jumperID), 1);
+            if (p.Type == PurchaseTypes.Companion && p.CompanionIDs.includes(+jumperID)) {
+                p.CompanionIDs.splice(p.CompanionIDs.indexOf(+jumperID), 1);
             }
 
         }
@@ -951,7 +962,7 @@ class Jump {
         if (!Chain.Characters[jumperID].Primary){
             for (let p of this.Purchases) {
                 if (p.Type != PurchaseTypes.Companion) continue;
-                if (!p.CompanionIDs.includes(jumperID)) continue;
+                if (!p.CompanionIDs.includes(+jumperID)) continue;
                 for (let c in p.Allowances) {
                     budget[c] += p.Allowances[c];
                 }
