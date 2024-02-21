@@ -335,7 +335,7 @@ function renderDrawback(drawback, expand = false){
 
     let buttonRow = E("div", {class: "persistent button_row"});
     buttonRow.append(
-        createIconButton("delete", "smallish", {Form: displayContainer, Item: drawback}), 
+        createIconButton("delete", "smallish", {Form: displayContainer, Item: drawback, UpdateCallback: budgetUpdate}), 
         createIconButton("edit", "smallish", {
             Form: displayContainer, 
             Item: drawback, 
