@@ -155,7 +155,7 @@ function createIconButton(type, modifiers = "", params = {}){
 
 function renderPurchase(purchase, updateCallback, expand = false, abbreviated = false, fixedSubtype = false){
     let displayContainer = E("form", {
-        class: "compact collapsable row highlightable", 
+        class: "collapsable row highlightable", 
         autocomplete: "off",
         id: `purchase${purchase.ID}_display`
     });
@@ -330,7 +330,7 @@ function renderDrawback(drawback, expand = false){
     let name = E("span", {class: `vcentered persistent label`, id: `Name_${IDSuffix}`})
     name.append(E("span", {placeholder: `[nameless ${(drawback.Type == DrawbackTypes.Scenario)? "scenario" : "drawback"}]`}, T(drawback.Name)));
 
-    let description = E("div", {class: "central userparagraph", id: `Description_${IDSuffix}`}, 
+    let description = E("div", {class: "faint central userparagraph", id: `Description_${IDSuffix}`}, 
         T(drawback.Description));
 
     let buttonRow = E("div", {class: "persistent button_row"});

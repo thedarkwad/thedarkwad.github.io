@@ -72,6 +72,7 @@ body {
     width:8rem;
     overflow-wrap: break-word;
     font-family: var(--body_font);
+    font-size: var(--body_font_size);
     outline:none;
     padding-right: 0.5rem;
     border:none;
@@ -409,15 +410,20 @@ main.neutral_container {
 
 
 .panel .row:not(.row .row), .panel > .tripart_row:not(.row .tripart_row), .flexrow {
-    padding-left: 0.25rem;
-    padding-right: 0.25rem;
     margin-left: 1rem;
     margin-right: 1rem;
-    margin-top: 0.2rem;
-    padding-top:0.1rem;
-    padding-bottom: 0.1rem;
-
 }
+
+.panel .row:not(:has(.row)) {
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+}
+
+.central.userparagraph:not(.collapsed *) {
+    padding-bottom: 0.3rem;
+}
+
+
 
 .neutral_container .row.split {
     margin-top: 0.3rem !important;
