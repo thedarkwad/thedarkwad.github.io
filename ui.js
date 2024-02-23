@@ -1024,7 +1024,7 @@ function renderSupplementScreen(panel, supplement) {
             - purchasesCost;            
     }
 
-    let budgetPanel = E("div", {class: "central vcentered"},
+    let budgetPanel = E("div", {class: "central vcentered", style: {marginTop: "0.5rem", marginBottom: "0.5rem"}},
         titleSpan,
         E("div", {style:{width: "5rem"}},
             E("span", {class: "label"}, T(`${supplement.Currency}:\u00A0`)),
