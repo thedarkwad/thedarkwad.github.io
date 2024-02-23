@@ -422,7 +422,7 @@ main.neutral_container {
     margin-top: 0.3rem;
 }
 
-.central.userparagraph:not(.collapsed *) {
+.collapsable:not(.collapsed) > div:last-of-type {
     padding-bottom: 0.3rem;
 }
 
