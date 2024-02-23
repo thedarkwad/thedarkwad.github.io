@@ -235,7 +235,6 @@ header nav.controls :is(a, label):hover {
     margin-top: 0.5rem;
 }
 
-
 .panels {
     display: flex;
     margin-top:0.5rem;
@@ -417,6 +416,10 @@ main.neutral_container {
 .panel .row:not(:has(.row)) {
     padding-left: 0.25rem;
     padding-right: 0.25rem;
+}
+
+.panel .row:first-of-type {
+    margin-top: 0.3rem;
 }
 
 .central.userparagraph:not(.collapsed *) {
