@@ -98,13 +98,16 @@ function doAccordian(button, expand = -1){
 }
 
 function createIconButton(type, modifiers = "", params = {}){
+
+    
     let button = E("a", {
-        href: "#;", 
+        href: "javascript:void(0);", 
         class: `icon button ${modifiers} ${type}`
     });
 
     switch(type){
         case "save":
+            if (!DP.Editable) return E("span");
             button.setAttribute("title", "Save");
             button.addEventListener("click", 
                 ()=>{
@@ -117,6 +120,7 @@ function createIconButton(type, modifiers = "", params = {}){
             false);
             break;
         case "edit":
+            if (!DP.Editable) return E("span");
             button.setAttribute("title", "Edit");
             button.addEventListener("click", ()=>{
                 toggleHighlighting(button);
@@ -126,6 +130,7 @@ function createIconButton(type, modifiers = "", params = {}){
             break;
         case "new":
             button.setAttribute("title", "New");
+            if (!DP.Editable) return E("span");
             button.addEventListener("click", ()=>{
                 let element = params.Callback();
                 let input = element.querySelector("input");
@@ -135,6 +140,7 @@ function createIconButton(type, modifiers = "", params = {}){
             break;
         case "delete":
             button.setAttribute("title", "Delete");
+            if (!DP.Editable) return E("span");
             button.addEventListener("click", () => {
                 if(!confirm("Are you sure you'd like to delete this? It cannot be undone.")) return;
                 if ("Callback" in params) params.Callback();
@@ -580,28 +586,33 @@ function renderBudgetBar(){
     let budgetBar = E("div", {class: "accent_row"});
 
     let titleSpan = E("span", {class: "vcentered"});
-    title = E("span", {class:"label jumptitle", placeholder:"[untitled jump]", contenteditable: "true", style:{justifySelf: "left"}}, 
+    title = E("span", {class:"label jumptitle", placeholder:"[untitled jump]", style:{justifySelf: "left"}}, 
         T(DP.ActiveJump.Name)
     );
 
-    title.addEventListener("paste", (e) => {
-        e.preventDefault();
-        let text = (e.originalEvent || e).clipboardData.getData('text/plain');
-        document.execCommand('inserttext', false, text);
-    }, false);
-
-    title.addEventListener("input", (e) => {
-        let toDelete = [];
-        for (let node of title.childNodes){
-            if (node.nodeType == Node.ELEMENT_NODE) toDelete.push(node);
-        }
-        for (let node of toDelete) {
-            node.replaceWith(T(node.textContent));
-        }
-
-        DP.ActiveJump.UpdateName(title.textContent);
-
-    }, false);
+    if (DP.Editable) {
+        title.setAttribute("contenteditable", "true");
+        title.addEventListener("paste", (e) => {
+            e.preventDefault();
+            let text = (e.originalEvent || e).clipboardData.getData('text/plain');
+            document.execCommand('inserttext', false, text);
+        }, false);
+    
+        title.addEventListener("input", (e) => {
+            let toDelete = [];
+            for (let node of title.childNodes){
+                if (node.nodeType == Node.ELEMENT_NODE) toDelete.push(node);
+            }
+            for (let node of toDelete) {
+                node.replaceWith(T(node.textContent));
+            }
+    
+            DP.ActiveJump.UpdateName(title.textContent);
+    
+        }, false);
+    
+    
+    }
 
     titleSpan.append(title);
     if(DP.ActiveJump.URL.length > 0) {
@@ -660,7 +671,7 @@ function renderPurchaseFilterBar(purchaseType, renderCallback, listContainer, su
 
     let filterBar = E("div", {class: "accent_row"});
 
-    let categorySelector = new CheckBoxSelect("Category", false, true);    
+    let categorySelector = new CheckBoxSelect("Category", false, false, true, true);    
     
     let categories = ((supplement) ? supplement.PurchaseCategories : Chain.PurchaseCategories[purchaseType]);
 
@@ -668,7 +679,7 @@ function renderPurchaseFilterBar(purchaseType, renderCallback, listContainer, su
         categorySelector.AddOption(cat.Name, cat.Name);
     }
 
-    let viewType = new CheckBoxSelect("View Type", true);
+    let viewType = new CheckBoxSelect("View Type", true, false, true, true);
     viewType.AddOption("Chronological View", "chronological", true);
     viewType.AddOption("Tag View", "tags", false);
 
@@ -1007,6 +1018,7 @@ function renderSupplementScreen(panel, supplement) {
         E("input", {type: "number", step: "50", min: "0", 
             max: maxInvestment, 
             value: DP.ActiveJump.SupplementInvestments[DP.ActiveJumperID][supplement.ID]});
+    if (!DP.Editable) investmentInput.setAttribute("disabled", "disabled");
 
     let updateSupplementScreen = () => {
         budgetUpdate();
@@ -1321,6 +1333,7 @@ function createCollapsingDivider(text, expanded = false, element = "div") {
 }
 
 function makeDragDroppabale (element, dragStart, dragEnd, drop){
+    if (!DP.Editable) return;
     element.setAttribute("draggable", "true");
     element.addEventListener("dragenter", (e) => {
         e.preventDefault();
@@ -1469,7 +1482,7 @@ function renderJumpSwitchSidebar(panel, replace = false){
         let jumpAvailable = jump.JumpedBy(DP.ActiveJumperID);
         jump.NameRender = jumpNameNode;
         let tab = E("a", {
-            href: "#;",
+            href: "javascript:void(0);",
             class: `tab${(jump.ID == DP.ActiveJump.ID)?" active":""}` 
                + `${(!jumpAvailable) ? " unavailable" : ""}`
             },
@@ -2122,7 +2135,7 @@ function renderItineraryTabs(contentPanel, render = true) {
     if (panelIndex == 0) DP.CurrentPanel = pages[0].Name;
 
     for (let i in pages) {
-        let tab = E("a", {href: "#;"}, T(pages[i].Name));
+        let tab = E("a", {href: "javascript:void(0);"}, T(pages[i].Name));
         tab.addEventListener("click", () => {
             DP.ActiveTab.classList.remove("active");
             tab.classList.add("active");
@@ -2144,11 +2157,10 @@ function renderItineraryTabs(contentPanel, render = true) {
 
 function populateItineraryMainPanel(reset = false){
 
-
     document.getElementById("upper_nav").querySelector(".active").classList.remove("active");
     document.getElementById("itinerary_tab").classList.add("active");
  
-    if (reset) DP = {};
+    if (reset) DP = {Editable: DP.Editable};
     if("ActiveJump" in DP == false) DP.ActiveJump = Chain.Jumps[0];
     if("ActiveJumperID" in DP == false) DP.ActiveJumperID = Object.keys(Chain.Characters)[0];
     
@@ -2210,7 +2222,7 @@ function populateTravelerManifestMainPanel(reset = false){
     document.getElementById("upper_nav").querySelector(".active").classList.remove("active");
     document.getElementById("traveler_manifest_tab").classList.add("active");
 
-    if (reset) DP = {};
+    if (reset) DP = {Editable: DP.Editable};
     if("ActiveJump" in DP == false) DP.ActiveJump = Chain.Jumps[0];
     if("ActiveJumperID" in DP == false) DP.ActiveJumperID = Object.keys(Chain.Characters)[0];
 
@@ -2253,7 +2265,7 @@ function populateTravelerManifestMainPanel(reset = false){
     let contentPanel = E("div", {class:"panel"});
 
     for (let i in pages) {
-        let tab = E("a", {href: "#;"}, T(pages[i].Name));
+        let tab = E("a", {href: "javascript:void(0);"}, T(pages[i].Name));
         tab.addEventListener("click", () => {
             DP.ActiveTab.classList.remove("active");
             tab.classList.add("active");
@@ -2280,7 +2292,7 @@ function populateCosmicCacheMainPanel(reset = false){
     document.getElementById("upper_nav").querySelector(".active").classList.remove("active");
     document.getElementById("cosmic_cache_tab").classList.add("active");
 
-    if (reset) DP = {};
+    if (reset) DP = {Editable: DP.Editable};
     if("ActiveJump" in DP == false) {DP.ActiveJump = Chain.Jumps[0]};
     if("ActiveJumperID" in DP == false) DP.ActiveJumperID = Object.keys(Chain.Characters)[0];
 
@@ -2313,7 +2325,7 @@ function populateCosmicCacheMainPanel(reset = false){
     let contentPanel = E("div", {class:"panel"});
 
     for (let i in pages) {
-        let tab = E("a", {href: "#;"}, T(pages[i].Name));
+        let tab = E("a", {href: "javascript:void(0);"}, T(pages[i].Name));
         tab.addEventListener("click", () => {
             DP.ActiveTab.classList.remove("active");
             tab.classList.add("active");
@@ -2340,6 +2352,7 @@ function renderBankingPanel(){
     let maxWithdrawl = -balance;
     
     let depositInput = E("input", {type:"number", step: 50});
+    if (!DP.Editable) depositInput.setAttribute("disabled", "disabled");
     depositInput.value = DP.ActiveJump.BankDeposits[DP.ActiveJumperID];
 
     let balanceDOM = T(`${balance + 
@@ -2733,7 +2746,7 @@ function populateChainFeaturesMainPanel(reset = false){
     let contentPanel = E("div", {class:"panel"});
 
     for (let i in pages) {
-        let tab = E("a", {href: "#;"}, T(pages[i].Name));
+        let tab = E("a", {href: "javascript:void(0);"}, T(pages[i].Name));
         tab.addEventListener("click", () => {
             DP.ActiveTab.classList.remove("active");
             tab.classList.add("active");
@@ -2751,4 +2764,18 @@ function populateChainFeaturesMainPanel(reset = false){
     mainPanel.append(tabs, contentPanel);
 
     main.append(E("nav", {class: "panel_control"}), mainPanel);
+}
+
+function renderErrorToUser(label, text){
+    let closeButton = 
+        E("a", {class: "icon button smallish delete", 
+            style: {position: "absolute", top: "0.5rem", right: "0.5rem"}, 
+            href: "javascript:void(0);"});
+
+    let errorBox = E("div", {class:"error_popup"}, 
+        E("div", {class: "label"}, T(label)), 
+        closeButton,
+        T(text));
+    closeButton.addEventListener("click", () => {errorBox.remove();});
+    document.body.append(errorBox);
 }

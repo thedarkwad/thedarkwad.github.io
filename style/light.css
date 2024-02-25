@@ -1,0 +1,81 @@
+body {
+    --faint_neutral_accent: #ededed;
+    --form_text_color: #171717;
+    --strong_neutral_accent: #767676;
+    --bright_accent_1:#c2d3ef; 
+    --bright_accent_2: #78a8f5;
+    --body_text: #171717;
+    --form_body_color: #ffffff;
+    --body_background: #ffffff;
+    --error_color: #a51b2e;
+    --error_text_color: var(--faint_neutral_accent);
+}
+
+.checkboxselect .body .option.selected .checkbox {
+    background-image: url(/icons/light/check.svg);
+}
+
+:is(a, label).icon.settings {
+    background-image: url(/icons/light/menu.svg);
+}
+
+:is(a, label).icon.delete {
+    background-image: url(/icons/light/xmark.svg);
+}
+
+:is(a, label).icon.delete.alt {
+    background-image: url(/icons/light/trash.svg);
+}
+
+:is(a, label).icon.download {
+    background-image: url(/icons/light/download.svg);
+}
+
+:is(a, label).icon.upload {
+    background-image: url(/icons/light/upload.svg);
+}
+
+:is(a, label).icon.save {
+    background-image: url(/icons/light/floppy-disk.svg);
+}
+
+:is(a, label).icon.expand {
+    background-image: url(/icons/light/arrow-down.svg);
+}
+
+:is(a, label).icon.collapse {
+    background-image: url(/icons/light/arrow-up.svg);
+}
+
+:is(a, label).icon.link {
+    background-image: url(/icons/light/new-window.svg);
+}
+
+:is(a, label).icon.expand.alt {
+    background-image: url(/icons/light/single-arrow-right.svg);
+}
+
+:is(a, label).icon.collapse.alt {
+    background-image: url(/icons/light/single-arrow-down.svg);
+}
+
+
+:is(a, label).icon.down {
+    background-image: url(/icons/light/arrow-down-square.svg);
+}
+
+:is(a, label).icon.up {
+    background-image: url(/icons/light/arrow-up-square.svg);
+}
+
+:is(a, label).icon.new.alt {
+    background-image: url(/icons/light/plus-square.svg);
+}
+
+:is(a, label).icon.new {
+    background-image: url(/icons/light/plus.svg);
+}
+
+:is(a, label).icon.edit {
+    background-image: url(/icons/light/pencil.svg);
+}

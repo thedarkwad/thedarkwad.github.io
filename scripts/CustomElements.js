@@ -1,9 +1,9 @@
 class CheckBoxSelect {
-    constructor(label, single = true, fullList = false, defaultSingle = true){
+    constructor(label, single = true, fullList = false, defaultSingle = true, forceEdit = false){
         this.Container = E("div", {class: "checkboxselect hidden"});
         this.Head = E("span", {class: "head"});
         this.Expand = E("a", {
-            href: "#;", 
+            href: "javascript:void(0);", 
             class: `icon button expand small alt`
         });
 
@@ -15,10 +15,13 @@ class CheckBoxSelect {
         this.DefaultSingle = defaultSingle;
         this.FullList = fullList;
 
-        this.Head.addEventListener("click", () => {
-            if (this.IsOpen) this.Close();
-            else this.Open();
-        });
+        if (DP.Editable || forceEdit)
+            this.Head.addEventListener("click", () => {
+                if (this.IsOpen) this.Close();
+                else this.Open();
+            });
+        else
+            this.Head.classList.add("disabled");
         this.DefaultText = label;
         this.Label = T(label);
         this.Body = E("div", {class: "body"});
@@ -153,14 +156,16 @@ class MultiNumeric {
         this.Container = E("div", {class: "checkboxselect hidden"});
         this.Head = E("span", {class: "head"});
         this.Expand = E("a", {
-            href: "#;", 
+            href: "javascript:void(0);", 
             class: `icon button expand small alt`
         });
-
-        this.Head.addEventListener("click", () => {
-            if (this.IsOpen) this.Close();
-            else this.Open();
-        });
+        if (DP.Editable)
+            this.Head.addEventListener("click", () => {
+                if (this.IsOpen) this.Close();
+                else this.Open();
+            });
+        else
+            this.Head.classList.add("disabled");
         this.Label = T(label);
         this.Body = E("div", {class: "numeric body"});
         
@@ -297,14 +302,17 @@ class OptionalNumeric {
         this.Container = E("div", {class: "checkboxselect hidden"});
         this.Head = E("span", {class: "head"});
         this.Expand = E("a", {
-            href: "#;", 
+            href: "javascript:void(0);", 
             class: `icon button expand small alt`
         });
 
-        this.Head.addEventListener("click", () => {
-            if (this.IsOpen) this.Close();
-            else this.Open();
-        });
+        if (DP.Editable)
+            this.Head.addEventListener("click", () => {
+                if (this.IsOpen) this.Close();
+                else this.Open();
+            });
+        else
+            this.Head.classList.add("disabled");
 
         this.Label = T(inactiveLabel);
         this.Body = E("div", {class: "numeric body"});
@@ -443,12 +451,17 @@ class ComplexConfigMenu {
             this.AddEntry(i);
         }
 
-        let newButton = E("a", {class:"icon button new smallish alt", href:"#;"});
-        newButton.addEventListener("click", () => {
-            let i = this.New();
-            this.AddEntry(i);
-            this.UpdateCallback(this.List[i]);            
-        });
+        let newButton;
+        if (DP.Editable) {
+            newButton = E("a", {class:"icon button new smallish alt", href:"javascript:void(0);"});
+            newButton.addEventListener("click", () => {
+                let i = this.New();
+                this.AddEntry(i);
+                this.UpdateCallback(this.List[i]);            
+            });    
+        } else {
+            newButton = E("span");
+        }
         this.Container.append(this.EntriesContainer, 
             E("div", {class: "button_row", style: {marginRight:"0.5rem"}}, 
                 newButton
@@ -466,6 +479,7 @@ class ComplexConfigMenu {
             let input = E(
                 (field.InputType == "textarea")?"textarea":"input", 
                 {id: `complex_${field}`, type: this.FieldList[field].InputType});    
+            if (!DP.Editable) input.setAttribute("disabled", "disabled");
             return input;
         }
         let input;
@@ -521,7 +535,7 @@ class ComplexConfigMenu {
         let label = T(item.Name);
         let head = E("div", {class: "complexhead"}, 
             label, 
-            E("a", {class:"icon button expand small alt", href:"#;"})
+            E("a", {class:"icon button expand small alt", href:"javascript:void(0);"})
         );
         newEntryDOM.append(head);
 
@@ -574,8 +588,8 @@ class ComplexConfigMenu {
         }
         );
 
-        if (!item.Essential){
-            let deleteButton = E("a", {class:"icon button delete small alt", href:"#;"});
+        if (!item.Essential && DP.Editable){
+            let deleteButton = E("a", {class:"icon button delete small alt", href:"javascript:void(0);"});
             let buttonRow = E("div", {class: "button_row", style: {marginRight:"0.5rem", gridColumn:"2"}}, 
                 deleteButton
             );

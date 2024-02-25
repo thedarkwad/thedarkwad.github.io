@@ -2,8 +2,8 @@
 <html>
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="style_shared.css">
-        <link rel="stylesheet" id="color_mode" href="style_light.css">
+        <link rel="stylesheet" href="/style/shared.css">
+        <link rel="stylesheet" id="color_mode" href="/style/light.css">
         <title>Jump the Cosmos!</title>
     </head>
     <body>
@@ -12,34 +12,37 @@
                 <h1 contenteditable="true" id="title" placeholder="[untitled jump chain]"></h1>
                 <nav class="controls">
                     <span class="dropdown_container hidden" id = "settings_dropdown">
-                        <a href="#;" class="icon settings" id="settings_button" title="Settings"></a>
+                        <a href="javascript:void(0);" class="icon settings" id="settings_button" title="Settings"></a>
                         <div class="dropdown_body">
                             
                         </div>
                     </span>
-                    <a href="#;" class="icon new" id="new_button" title="New Chain"></a>
-                    <a href="#;" class="icon save" id="save_button" title="Save"></a>
-                    <a href="#;" class="icon download" id="export_button" title="Export"></a>
+                    <a href="javascript:void(0);" class="icon new" id="new_button" title="New Chain"></a>
+                    <span class="dropdown_container hidden" id = "save_dropdown">
+                        <a href="javascript:void(0);" class="icon save" id="save_button" title="Settings"></a>
+                        <div class="dropdown_body">
+                            
+                        </div>
+                    </span>
+                    <a href="javascript:void(0);" class="icon download" id="export_button" title="Export"></a>
                     <label class="icon upload" id="import_button" for="file_import" title="Import"> 
                         <input type="file" id="file_import"></input>
                     </label>
                 </nav>
             </div>
             <nav class="tabs" id="upper_nav">
-                <a href="#;" id="itinerary_tab" class="active" onclick="populateItineraryMainPanel();">Jump Itinerary</a>
-                <a href="#;" id="traveler_manifest_tab" onclick="populateTravelerManifestMainPanel();">Traveler Manifest</a>
-                <a href="#;" id="cosmic_cache_tab" onclick="populateCosmicCacheMainPanel();" >Cosmic Cache</a>
-                <a href="#;" id="chain_features_tab" onclick="populateChainFeaturesMainPanel();">Chain Features</a>
+                <a href="javascript:void(0);" id="itinerary_tab" class="active" onclick="populateItineraryMainPanel();">Jump Itinerary</a>
+                <a href="javascript:void(0);" id="traveler_manifest_tab" onclick="populateTravelerManifestMainPanel();">Traveler Manifest</a>
+                <a href="javascript:void(0);" id="cosmic_cache_tab" onclick="populateCosmicCacheMainPanel();" >Cosmic Cache</a>
+                <a href="javascript:void(0);" id="chain_features_tab" onclick="populateChainFeaturesMainPanel();">Chain Features</a>
             </nav>
         </header>
         <div class="panels" id="main">
         </div>
-        <script src="jumpchain.js"></script>
-        <script src="ui.js"></script>
-        <script src="CustomElements.js"></script>
-        <script src="main.js"></script>
-        <script>
-
-        </script>
+        <script src="/scripts/jumpchain.js"></script>
+        <script src="/scripts/ui.js"></script>
+        <script src="/scripts/CustomElements.js"></script>
+        <script src="/scripts/jsondiff.js"></script>
+        <script src="/scripts/main.js"></script>
     </body>
 </html>

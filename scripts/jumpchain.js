@@ -171,6 +171,25 @@ class ChainClass {
 
     }
 
+    RecalculateJumperStats(){
+        for (let cID in this.Characters) {
+            this.Characters[cID].PerkCount = 0;
+            this.Characters[cID].ItemCount = 0;
+        }
+        for (let j of this.Jumps) {
+            for (let p of j.Purchases) {
+                
+                if (p.Type == PurchaseTypes.Perk) {
+                    this.Characters[p.JumperID].PerkCount++;
+                }
+
+                if (p.Type == PurchaseTypes.Item) {
+                    this.Characters[p.JumperID].ItemCount++;
+                }
+            }
+        }
+    }
+
     RegisterChainDrawback(d) {
         d.ID = unusedID;
         this.Drawbacks.push(d);
@@ -206,6 +225,9 @@ class ChainClass {
         this.Drawbacks = this.Drawbacks.map((d) => {return new ChainDrawback(d.JumperID).Deserialize(d);});
         this.HouseRules = this.HouseRules.map((n) => {return new Note(n.Title, n.Text);});
         this.Supplements = this.Supplements.map((s) => {return new ChainSupplement().Deserialize(s);});
+
+        this.RecalculateJumperStats();
+
         return this;
     }
 
@@ -417,6 +439,15 @@ class Purchase {
                 delete jump.SubsystemAccess[this.JumperID][i];
             }
         }
+
+        if (this.Type == PurchaseTypes.Perk) {
+            Chain.Characters[this.JumperID].PerkCount--;
+        }
+
+        if (this.Type == PurchaseTypes.Item) {
+            Chain.Characters[this.JumperID].ItemCount--;
+        }
+    
         jump.UpdateBudgets(this.JumperID);
     }
 
