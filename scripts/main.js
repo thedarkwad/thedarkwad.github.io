@@ -70,8 +70,6 @@ async function loadFromCloud(edit, accessKey) {
         editID = JSON.parse(response.headers.get("EditID"));
         unusedID = newUnusedID;
         Chain.Deserialize(jsonChain);
-        if (edit == "view")
-            localStorage.setItem("autosave", false);
         lastSavedChainDump = JSON.stringify([unusedID, Chain]);
         beginRender();    
     } catch (error) {
@@ -212,6 +210,7 @@ function applyUserPreferences() {
     if (localStorage.getItem("autosave") == "true") {
         autosave = setInterval(
             async () => {
+                if (!DP.Editable) return;
                 if (!accessKeys) {
                     saveLocally();
                 } else if (accessKeys.Edit){
@@ -298,6 +297,7 @@ function setupSettingsDropdown(panel){
         if (autosaveSelect.value == "true") {
             autosave = setInterval(
                 async () => {
+                    if (!DP.Editable) return;
                     if (!accessKeys) {
                         saveLocally();
                     } else if (accessKeys.Edit){
@@ -373,7 +373,7 @@ function setupSaveDropdown(panel){
             title: "Link for sharing without editing privileges"
         }, T("Copy View URL"));
         copyButton.addEventListener("click", () => {
-            navigator.clipboard.writeText(`${window.location.origin}/view/${accessKeys.View}`);
+            navigator.clipboard.writeText(`${window.location.host}/view/${accessKeys.View}`);
         });
         panel.append(E("div", {class: "vcentered", style: {justifyContent: "center"}},
             E("a", {class: "icon button link", 
@@ -394,7 +394,7 @@ function setupSaveDropdown(panel){
             title: "Link for sharing with editing privileges"
         }, T("Copy Edit URL"));
         copyButton.addEventListener("click", () => {
-            navigator.clipboard.writeText(`${window.location.origin}/edit/${accessKeys.Edit}`);
+            navigator.clipboard.writeText(`${window.location.host}/edit/${accessKeys.Edit}`);
         });
         panel.append(E("div", {class: "vcentered", style: {justifyContent: "center"}},
             E("a", {class: "icon button link", 
