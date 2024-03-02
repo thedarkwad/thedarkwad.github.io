@@ -338,6 +338,10 @@ header nav.controls :is(a, label):hover {
     color:var(--faint_neutral_accent);
 }
 
+.panel_control .tab.unavailable:hover {
+    color: var(--bright_accent_1) !important;
+}
+
 .panel_control a.tab:not(.active):not(.unavailable):hover {
     color: var(--bright_accent_2) !important;
 
@@ -421,10 +425,6 @@ main.neutral_container {
 
 .panel .row:first-of-type {
     margin-top: 0.3rem;
-}
-
-.collapsable:not(.collapsed) > div:last-of-type {
-    padding-bottom: 0.3rem;
 }
 
 

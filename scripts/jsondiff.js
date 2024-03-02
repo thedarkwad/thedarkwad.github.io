@@ -6,19 +6,22 @@ const DiffTypes = {
 
 function getDiff(a, b) {
 
-    if(typeof a != "object" || typeof b != "object")
+    if (typeof a != "object" || typeof b != "object")
         return [DiffTypes.Replace, b];
+    if ((Array.isArray(b) && !Array.isArray(a)) || (Array.isArray(a) && !Array.isArray(b)))
+        return [DiffTypes.Replace, b];
+
 
     let diff = {};
     let keys = new Set([...Object.keys(a), ...Object.keys(b)]);
     for (let key of keys) {
 
         if ((key in a) && !(key in b)) {
-            // if (!Array.isArray(b) || b.length == key)
-                diff[key] = [DiffTypes.Delete]; 
+            if (!Array.isArray(b) || b.length == key)
+                diff[key] = [DiffTypes.Delete];
             continue;
         }
-
+        
         if(!(key in a) && (key in b)) {
                 diff[key] = [DiffTypes.Replace, b[key]]; 
                 continue;
@@ -38,6 +41,9 @@ function getDiff(a, b) {
 }
 
 function applyDiff(a, diff){
+    if (a == undefined) {
+        throw Error("Diff Error!");
+    }
     for (let key in diff) {
         switch (diff[key][0]) {
             case DiffTypes.Delete:

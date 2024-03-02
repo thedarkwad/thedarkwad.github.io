@@ -231,7 +231,7 @@ function renderPurchase(purchase, updateCallback, expand = false, abbreviated = 
 
     let currencyAbbrev = (isSupplement) ? purchase.Supplement.Currency : purchase.Jump.Currencies[purchase.Currency].Abbrev;
 
-    let costPane = E("div", {class: "persistent central"}, 
+    let costPane = E("div", {class: "persistent central vcentered"}, 
         E("span", {class:"sublabel"}, T("Cost:\u00A0")), 
         E("span", {id: `Value_${purchase.Jump.ID}_${purchase.ID}`},
             T(`${purchase.Cost}`)), 
@@ -355,7 +355,7 @@ function renderDrawback(drawback, expand = false){
 
     let currencyAbbrev = (drawback.Jump)?DP.ActiveJump.Currencies[drawback.Currency].Abbrev:"CP";
 
-    let costPane = E("div", {class: "persistent central"}, 
+    let costPane = E("div", {class: "persistent central vcentered"}, 
         E("span", {class:"sublabel"}, T("Value:\u00A0")), 
         E("span", {id: `Value_${IDSuffix}`},
             T(`${drawback.Cost}`)

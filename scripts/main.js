@@ -322,15 +322,17 @@ function processSaveError(err) {
     switch (err.cause) {
         case "Conflict":
             renderErrorToUser("Edit Confict Detected",
-                "It appears that someone else is editing the same Chain as you. Autosave is temporarily disabled. Save again to overwrite Chain.");
-            editRaceDetected = true;
-            localStorage.setItem("autosave", false);
-            setupSaveDropdown(document.getElementById("save_dropdown").querySelector(".dropdown_body"));
-            setupSettingsDropdown(document.getElementById("settings_dropdown").querySelector(".dropdown_body"));
+                "It appears that someone else is editing the same Chain as you. Autosave is temporarily disabled. Save again to overwrite Chain or refresh page to discard changes.");
             break;
         default:
-            renderErrorToUser("Save Failed", "Unable to save to cloud for unknown reason.");
+            renderErrorToUser("Save Failed", "Unable to save to cloud for unknown reason. Autosave is temporarily disabled. Save again to overwrite Chain.");
     }
+
+    editRaceDetected = true;
+    localStorage.setItem("autosave", false);
+    setupSettingsDropdown(document.getElementById("settings_dropdown").querySelector(".dropdown_body"));
+    setupSaveDropdown(document.getElementById("save_dropdown").querySelector(".dropdown_body"));
+
 
 }
 

@@ -703,6 +703,15 @@ class Jump {
             }
         } 
 
+        for (let p of this.Purchases) {
+            if (p.Currency in this.Currencies == false) p.Currency = 0;
+        } 
+        
+        for (let p of this.Drawbacks) {
+            if (p.Currency in this.Currencies == false) p.Currency = 0;
+        } 
+
+
         return this;
     }
 
@@ -744,6 +753,11 @@ class Jump {
             if (p.Allowances && c.ID in p.Allowances) delete p.Allowances[c.ID];
             if (p.Stipends && c.ID in p.Stipends) delete p.Stipends[c.ID];
         } 
+
+        for (let p of this.Drawbacks) {
+            if (p.Currency == c.ID) p.Currency = 0;
+        } 
+
     }
 
 
