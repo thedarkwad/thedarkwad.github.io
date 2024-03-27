@@ -31,7 +31,7 @@ function displayHeight (height){
     let imperialUnits = localStorage.getItem("unitsImperial") == "true";
     if (!imperialUnits) return `${height}`;
     let feet = Math.floor(height / 12);
-    let inches = height - feet * 12;
+    let inches = Math.floor(height - feet * 12);
     return `${feet}\u00A0ft ${inches}`;
 }
 
@@ -172,7 +172,7 @@ function renderPurchase(purchase, updateCallback, expand = false, abbreviated = 
     let subtypeName = purchase.Jump.PurchaseSubTypes[+purchase.Subtype].Name;
     if(!abbreviated)
         addReorderEventListeners(displayContainer, 
-            purchase, DP.ActiveJump.Purchases, "Purchase");
+            purchase, DP.ActiveJump.Purchases, `${fixedSubtype?"Supplement":""}Purchase`);
 
     let name = E("span", 
         {class: `persistent label${abbreviated?" abbrev":""}`, id: `Name_${purchase.Jump.ID}_${purchase.ID}`})
@@ -1076,7 +1076,7 @@ function renderSupplementScreen(panel, supplement) {
         let p = purchaseList[i];
         if ( ((supplement.CompanionAccess == CompanionAccess.Communal) || p.JumperID == DP.ActiveJumperID) 
             && p.Type == PurchaseTypes.Supplement && p.Supplement.ID == supplement.ID){
-            newPurchases.append(renderPurchase(p, budgetUpdate, false, false));   
+            newPurchases.append(renderPurchase(p, updateSupplementScreen, false, false));   
         }
     }
 
@@ -1088,7 +1088,7 @@ function renderSupplementScreen(panel, supplement) {
     let newPurchase = E("div", {class: "button_row"}, 
         createIconButton("new", "", { Callback: () => {
             let p = DP.ActiveJump.NewPurchase(DP.ActiveJumperID, PurchaseTypes.Supplement, supplement);
-            let newRender = renderPurchase(p, budgetUpdate, true, false);
+            let newRender = renderPurchase(p, updateSupplementScreen, true, false);
             newPurchases.insertBefore(newRender, bottomRow);
             swapInInputs(newRender, p, p.FieldList, (pu, expand) => {
                 updateSupplementScreen(); return renderPurchase(pu, updateSupplementScreen, expand, false);
@@ -1313,6 +1313,7 @@ function renderAltFormScreen(panel){
         for (let form of j.PhysicalForms) {
             if(form.JumperID == DP.ActiveJumperID){
                 panel.append(E("div", {class: "row"}, renderAltForm(form , false)) );        
+                panel.append(E("div", {class:"hrule"}));
             }
         }    
     }
@@ -1632,6 +1633,7 @@ function renderNarrativeSummaryScreen(panel) {
                 j,
                 (j.Name ? j.Name : "[untitled jump]") + ":")
             );
+            panel.append(E("div", {class:"hrule"}));
     }
 }
 
@@ -1679,8 +1681,8 @@ function renderAltForm(altForm, deletable = true, showName = true){
     let buttons = E("div", {class: ""});
     
     if (deletable) 
-        buttons.append(createIconButton("delete", "smallish", {Form: container, Item: altForm}));
-    buttons.append(createIconButton("edit", "smallish", {
+        buttons.append(createIconButton("delete", "small", {Form: container, Item: altForm}));
+    buttons.append(createIconButton("edit", "small", {
             Form: container,
             Item: altForm,
             FieldList: altForm.FieldList,
@@ -1977,11 +1979,14 @@ function renderSubtypeConfiguration(budgetbar){
             renderItineraryTabs(document.getElementById("main_content_panel"), false)
         );
         let i = DP.ActiveJump.PurchaseSubTypes.indexOf(item);
-        for (let j = 0; j < DP.ActiveJump.Purchases.length; j++) {
-            let p = DP.ActiveJump.Purchases[j];
-            if (p.Subtype == i) {
-                p.Type = item.Type;
-            }
+        for (let jID in DP.ActiveJump.SubsystemAccess) {
+            if (i in DP.ActiveJump.SubsystemAccess[jID] == false) continue;
+            for (let j = 0; j < DP.ActiveJump.Purchases.length; j++) {
+                let p = DP.ActiveJump.Purchases[j];
+                if (p.ID == DP.ActiveJump.SubsystemAccess[jID][i].PurchaseID) {
+                    p.Type = item.Type;
+                }
+            }    
         }
         budgetUpdate();
     }, false);

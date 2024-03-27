@@ -30,6 +30,127 @@ const ChainSettings = {
 
 let unusedID = 0;
 
+let ExportFormats = {
+    HTML: 0,
+    BBCode: 1,
+    Reddit: 2
+};
+
+function escapeText(text, exportFormat)
+{
+    switch (exportFormat) {
+        case ExportFormats.HTML:
+            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");   
+        case ExportFormats.BBCode:
+            return `[plain]${text}[/plain]`;
+        default:
+            return text;
+    }
+ }
+
+function exTag(tag, text, exportFormat) {
+    switch (tag) {
+        case "h1":
+            switch (exportFormat) {
+                case ExportFormats.HTML:
+                    return `<h1>${text}</h1>\n`; 
+                case ExportFormats.BBCode:
+                    return `[h1]${text}[/h1]\n`;
+                case ExportFormats.Reddit:
+                    return `# ${text}\n`;  
+            }
+        break;
+        case "h2":
+            switch (exportFormat) {
+                case ExportFormats.HTML:
+                    return `<h2>${text}</h2>\n`; 
+                case ExportFormats.BBCode:
+                    return `[h2]${text}[/h2]\n`;
+                case ExportFormats.Reddit:
+                    return `## ${text}\n`;  
+            }
+        break;
+        case "b":
+            switch (exportFormat) {
+                case ExportFormats.HTML:
+                    return `<b>${text}</b>`; 
+                case ExportFormats.BBCode:
+                    return `[b]${text}[/b]`;
+                case ExportFormats.Reddit:
+                    return `__${text}__`;  
+            }
+        break;
+        case "i":
+            switch (exportFormat) {
+                case ExportFormats.HTML:
+                    return `<i>${text}</i>`; 
+                case ExportFormats.BBCode:
+                    return `[i]${text}[/i]`;
+                case ExportFormats.Reddit:
+                    return `_${text}_`;  
+            }
+        break;
+
+
+    }
+}
+
+function exParagraph(title, text, exportFormat){
+
+    switch(exportFormat) {
+        case ExportFormats.HTML:
+            return "<p>\n" + `<h3>${title}</h3>\n` + text + "</p>\n";
+        case ExportFormats.BBCode:
+            return `[SPOILER=${title}]\n${text}[/SPOILER]`;
+        case ExportFormats.Reddit:
+            return `### ${title}\n${text}`;    
+
+    }
+    
+}
+
+function exList(items, exportFormat){
+    let ret = "";
+    
+    if (items.length == 0) return ret;
+
+    switch(exportFormat) {
+        case ExportFormats.HTML:
+            ret += "<ul>\n";
+            for (let i of items) {
+                ret += `<li>${i}</li>\n`
+            }
+            ret += "</ul>";
+            break;
+        case ExportFormats.BBCode:
+            ret += "[LIST]\n";
+            for (let i of items) {
+                ret += `[*]${i}\n`
+            }
+            ret += "[/LIST]";
+            break;
+        case ExportFormats.Reddit:
+            for (let i of items) {
+                ret += `- ${i}\n`
+            }
+        break;
+    }
+    return ret;
+
+}
+
+
+function exLink(text, url, exportFormat){
+    switch(exportFormat) {
+        case ExportFormats.HTML:
+            return `<a href="${url}">${text}</a>`;
+        case ExportFormats.BBCode:
+            return `[URL=${url}]${text}[/URL]`;
+        case ExportFormats.Reddit:
+            return `[${text}]${url}`;    
+    }
+
+}
 
 
 class Jumper {
@@ -48,6 +169,49 @@ class Jumper {
         this.OriginalBackground = {Summary: "Typical Universe Denizen", Description: ""};
         this.PerkCount = 0;
         this.ItemCount = 0;
+    }
+
+    Export(format, includePerks = false) {
+        let ex = "";
+        ex += exTag("h2", escapeText(this.Name, format), format) ; 
+        ex += exTag("b", "Original Age:", format) + " " + escapeText(this.OriginalAge, format) + "\n";
+        ex += exTag("b", "Gender:", format) + " " + escapeText(this.Gender, format) + "\n";
+        ex += exTag("b", "Background:", format) + " " + escapeText(this.OriginalBackground.Summary, format) + "\n";
+        if (this.OriginalBackground.Description) ex += escapeText(this.OriginalBackground.Description) + "\n";
+        
+        let personalityExports = [];
+        
+        if (this.Personality.length > 0) {
+            personalityExports.push(exTag("b", "Personality:", format) + " " + escapeText(this.Personality, format));
+        }
+
+        if (this.Motivation.length > 0) {
+            personalityExports.push(exTag("b", "Motivation:", format) + " " + escapeText(this.Motivation, format));
+        }
+
+        if (this.Likes.length > 0) {
+            personalityExports.push(exTag("b", "Likes:", format) + " " + escapeText(this.Likes, format));
+        }
+
+        if (this.Dislikes.length > 0) {
+            personalityExports.push(exTag("b", "Dislikes:", format) + " " + escapeText(this.Dislikes, format));
+        }
+
+        if (this.Quirks.length > 0) {
+            personalityExports.push(exTag("b", "Quirks:", format) + " " + escapeText(this.Quirks, format));
+        }
+
+        if (personalityExports.length > 0){
+            ex += exParagraph("Personality:",
+            exList(personalityExports, format),
+            format);      
+        }
+
+        // ex += exParagraph("Body:",
+        //     this.OriginalForm.Export(format),
+        // format);      
+
+        return ex;
     }
 
     Deserialize(json) {
@@ -218,13 +382,13 @@ class ChainClass {
 
     Deserialize(json) {
         Object.assign(this, json);
-        this.Jumps = this.Jumps.map((j) => {return new Jump().Deserialize(j);});
+        this.Jumps = this.Jumps.filter((i) => (i != null) && (i != undefined)).map((j) => {return new Jump().Deserialize(j);});
         for (let cID in this.Characters) {
             this.Characters[cID] = new Jumper().Deserialize(this.Characters[cID]);
         }
-        this.Drawbacks = this.Drawbacks.map((d) => {return new ChainDrawback(d.JumperID).Deserialize(d);});
-        this.HouseRules = this.HouseRules.map((n) => {return new Note(n.Title, n.Text);});
-        this.Supplements = this.Supplements.map((s) => {return new ChainSupplement().Deserialize(s);});
+        this.Drawbacks = this.Drawbacks.filter((i) => (i != null) && (i != undefined)).map((d) => {return new ChainDrawback(d.JumperID).Deserialize(d);});
+        this.HouseRules = this.HouseRules.filter((i) => (i != null) && (i != undefined)).map((n) => {return new Note(n.Title, n.Text);});
+        this.Supplements = this.Supplements.filter((i) => (i != null) && (i != undefined)).map((s) => {return new ChainSupplement().Deserialize(s);});
 
         this.RecalculateJumperStats();
 
@@ -374,8 +538,12 @@ class Purchase {
             this.Duration = -1;
         }
 
+    }
 
-
+    Export() {
+        let ex = "";
+        ex += `${exTag("b", escapeText(this.Name), format)}[${ex}]`;
+        return ex;
     }
 
     Deserialize(json) {
@@ -690,9 +858,9 @@ class Jump {
 
     Deserialize(json) {
         Object.assign(this, json);
-        this.Purchases = this.Purchases.map((p) => {return new Purchase(p.JumperID, p.Type).Deserialize(p);});
-        this.PhysicalForms = this.PhysicalForms.map((f) => {return new AltForm(f.JumperID).Deserialize(f);});
-        this.Drawbacks = this.Drawbacks.map((d) => {return new Drawback(d.JumperID, d.Type).Deserialize(d);});
+        this.Purchases = this.Purchases.filter((i) => (i != null) && (i != undefined)).map((p) => {return new Purchase(p.JumperID, p.Type).Deserialize(p);});
+        this.PhysicalForms = this.PhysicalForms.filter((i) => (i != null) && (i != undefined)).map((f) => {return new AltForm(f.JumperID).Deserialize(f);});
+        this.Drawbacks = this.Drawbacks.filter((i) => (i != null) && (i != undefined)).map((d) => {return new Drawback(d.JumperID, d.Type).Deserialize(d);});
 
         for (let charID in this.SubsystemAccess) {
             for (let i in this.SubsystemAccess[charID]) {
@@ -1087,6 +1255,7 @@ class AltForm {
     }
 
     get Height(){
+        if (!this.HeightInUnits) return 0;
         let imperial = localStorage.getItem("unitsImperial") == "true";
         if (imperial == this.HeightImperial){
             return truncate(this.HeightInUnits);
@@ -1107,8 +1276,9 @@ class AltForm {
     }
 
     get Weight(){
+        if (!this.WeightInUnits) return 0;
         let imperial = localStorage.getItem("unitsImperial") == "true";
-        if (imperial == this.HeightImperial){
+        if (imperial == this.HeightImperial) {
             return truncate(this.WeightInUnits);
         }
         if (imperial) {

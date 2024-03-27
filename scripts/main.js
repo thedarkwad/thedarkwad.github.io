@@ -93,6 +93,7 @@ function beginRender() {
     if(!DP.Editable) {
         titleDOM.setAttribute("contenteditable", "false");
     } else {
+        titleDOM.setAttribute("contenteditable", "true");
         titleDOM.addEventListener("input", () =>{
             let toDelete = []
             for (let node of titleDOM.childNodes){
