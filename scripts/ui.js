@@ -282,6 +282,7 @@ function renderPurchase(purchase, updateCallback, expand = false, abbreviated = 
 
         let stipends = [];
         for (let c in purchase.Jump.Currencies) {
+            if ( (c in purchase.Stipends) == false) purchase.Stipends[c] = {};
             let cStipendContainer = 
                 E("span", {id: `Stipends_${c}_${purchase.Jump.ID}_${purchase.ID}`, style: {marginLeft:"0.5rem"},  title: "Points to be spent in a particular category"});
             if (Object.keys(purchase.Stipends[c]).length > 0)  cStipendContainer.append(

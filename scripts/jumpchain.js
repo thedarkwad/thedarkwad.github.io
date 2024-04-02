@@ -909,6 +909,11 @@ class Jump {
         c.ID = unusedID;
         this.Currencies[c.ID] = c;
         for (let jID in Chain.Characters) this.StipendRenders[jID][c.ID] = {};
+        for (let p of this.Purchases) {
+            if (p.Stipends) {
+                p.Stipends[c.ID] = {};
+            }
+        } 
         return unusedID++;
     }
 
